@@ -6,18 +6,18 @@
 CREATE TABLE `UserRoles`
 (
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `Title` VARCHAR(20) NOT NULL UNIQUE,
+  `Title` CHAR(20) NOT NULL UNIQUE,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB;
 
 -- A list of (all) activities a user (not everyone) can do
 CREATE TABLE `UserPrivileges`
 (
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `Title` VARCHAR(30) NOT NULL UNIQUE
+  `Title` CHAR(30) NOT NULL UNIQUE
     COMMENT 'What a user can do',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB;
 
 -- Determines which activities are allowed for a give role
 CREATE TABLE `PrivilegesByRole`
@@ -27,23 +27,26 @@ CREATE TABLE `PrivilegesByRole`
   FOREIGN KEY (`RoleId`) REFERENCES `UserRoles` (`Id`),
   FOREIGN KEY (`PrivilegeId`) REFERENCES `UserPrivileges` (`Id`),
   PRIMARY KEY (`RoleId`, `PrivilegeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB;
 
 -- Users personal data
+-- Don't forget to make changes on createUser() when modifying this table!
 CREATE TABLE `Users` (
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `RoleId` INT UNSIGNED NOT NULL,
-  `Email` VARCHAR(255) NOT NULL UNIQUE,
-  `Name` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `Password` VARCHAR(32) NOT NULL,
+  `Email` CHAR(255) NOT NULL UNIQUE,
+  `Name` CHAR(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `Password` CHAR(32) NOT NULL,
+  `RegDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    COMMENT 'Registration date',
   PRIMARY KEY (`Id`),
   KEY `AuthIndex` (`Email`,`Password`),
   FOREIGN KEY (`RoleId`) REFERENCES `UserRoles` (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB;
 
 -- Current state of user's variables
 -- When a user is deleted from Users table, a corresponding record from
--- this table is also deleted
+-- this table is also deleted (cascade delition)
 CREATE TABLE `UserMetrics`
 (
   `UserId` INT UNSIGNED NOT NULL
@@ -58,19 +61,80 @@ CREATE TABLE `UserMetrics`
   `PeriodEnd` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE CASCADE,
   PRIMARY KEY (`UserId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB;
 
 -- When a user of a give role is being created, we need to know how many
 -- polls he/she can create etc.
 CREATE TABLE `RatesByRole` (
   `Id` INT unsigned NOT NULL AUTO_INCREMENT,
   `RoleId` INT unsigned NOT NULL,
-  `RateParameter` varchar(30) NOT NULL,
+  `RateParameter` CHAR(30) NOT NULL,
   `RateValue` INT NOT NULL,
   FOREIGN KEY (`RoleId`) REFERENCES `UserRoles` (`Id`),
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='This table is used 
 on creation of a user for initialization of rates';
+
+-- List of polls
+-- When a user is deleted from Users table, corresponding records from
+-- this table are also deleted (cascade delition)
+CREATE TABLE `Polls`
+(
+  `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `UserId` INT UNSIGNED NOT NULL
+    COMMENT 'Poll creator. Equals zero for temporary users',
+  `Name` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL
+    COMMENT 'A name (title) for the poll',
+  `CreationDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `FiltersMask` TINYINT UNSIGNED DEFAULT 0
+    COMMENT 'Bit musk, defines which filters are used',
+  FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE CASCADE,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB;
+
+-- List of items for polls (one item = question + options)
+-- When a poll is deleted from Polls table, corresponding records from
+-- this table are also deleted (cascade delition)
+CREATE TABLE PollItems
+(
+  `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `PollId` INT UNSIGNED NOT NULL,
+  `QuestionText` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `ImagePath` CHAR(255),
+  `InputType` ENUM('checkbox','radio','text') NOT NULL,
+  `IsFinal` BOOLEAN
+    COMMENT 'Final item (page) does not have questions, it is used to communicate with a quizzee',
+  `FinalLink` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci
+    COMMENT 'On competion the poll the quizzee will be redirected according to this link',
+  `FinalComment` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+  FOREIGN KEY (`PollId`) REFERENCES `Polls` (`Id`) ON DELETE CASCADE,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB;
+
+-- List of options for a poll item
+-- When a poll item is deleted from PollItems table, corresponding records from
+-- this table are also deleted (cascade delition)
+CREATE TABLE ItemOptions
+(
+  `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `PollId` INT UNSIGNED NOT NULL,
+  `ItemId` INT UNSIGNED NOT NULL,
+  `OptionText` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`),
+  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`Id`) ON DELETE CASCADE,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB;
+
+
+
+
+
+
+
+
+
+
+
 
 
 -- -----------------
@@ -86,8 +150,8 @@ DELIMITER //
 CREATE PROCEDURE `createUser` (IN roleId INT, IN email VARCHAR(255), IN name VARCHAR(20) CHARSET utf8, IN pwd VARCHAR(32))
 BEGIN
     START TRANSACTION;
-    INSERT INTO `Users` (`Id`, `RoleId`, `Email`, `Name`, `Password`)
-    VALUES (NULL, roleId, email, name, pwd);
+    INSERT INTO `Users` (`Id`, `RoleId`, `Email`, `Name`, `Password`, `RegDate`)
+    VALUES (NULL, roleId, email, name, pwd, NULL);
 
     INSERT INTO `UserMetrics` (`UserId`, `PollsLeft`, `AnsLeft`, `PeriodEnd`)
     VALUES (
@@ -124,4 +188,12 @@ VALUES (1, 'PollsLeft', 100), (1, 'AnsLeft', 1000);
 -- Using a nice procedure to create the very first user
 CALL createUser(1, 'admin@surveyzilla.ru', 'Admin', MD5('l234'));
 
+-- Creating a sample poll
+INSERT INTO `Polls` (`Id`, `UserId`, `Name`, `CreationDate`, `FiltersMask`)
+VALUES (NULL, '1', 'Фрукты', NULL, '0');
 
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalLink`, `FinalComment`)
+VALUES (NULL, '1', 'Какие из этих фруктов Вы предпочитаете?', NULL, 'radio', NULL, NULL, NULL);
+
+INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
+VALUES (NULL, '1', '1', 'Яблоки'), (NULL, '1', '1', 'Груши');
