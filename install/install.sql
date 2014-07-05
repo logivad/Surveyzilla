@@ -105,7 +105,7 @@ CREATE TABLE PollItems
   `IsFinal` BOOLEAN
     COMMENT 'Final item (page) does not have questions, it is used to communicate with a quizzee',
   `FinalLink` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci
-    COMMENT 'On competion the poll the quizzee will be redirected according to this link',
+    COMMENT 'On competion of the poll the quizzee will be redirected according to this link',
   `FinalComment` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
   FOREIGN KEY (`PollId`) REFERENCES `Polls` (`Id`) ON DELETE CASCADE,
   PRIMARY KEY (`Id`)
@@ -125,8 +125,20 @@ CREATE TABLE ItemOptions
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB;
 
-
-
+-- Logic router. Determines which item (question) will go next based on
+-- current item and selected option
+CREATE TABLE Logic
+(
+  `PollId` INT UNSIGNED NOT NULL,
+  `ItemId` INT UNSIGNED NOT NULL,
+  `OptionId` INT UNSIGNED NOT NULL,
+  `NextItemId` INT UNSIGNED NOT NULL
+    COMMENT 'Zero when poll is complete',
+  FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`),
+  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`Id`),
+  FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`) ON DELETE CASCADE,
+  PRIMARY KEY (`PollId`, `ItemId`, `OptionId`)
+) ENGINE=InnoDB;
 
 
 
@@ -193,7 +205,23 @@ INSERT INTO `Polls` (`Id`, `UserId`, `Name`, `CreationDate`, `FiltersMask`)
 VALUES (NULL, '1', 'Фрукты', NULL, '0');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalLink`, `FinalComment`)
-VALUES (NULL, '1', 'Какие из этих фруктов Вы предпочитаете?', NULL, 'radio', NULL, NULL, NULL);
+VALUES (1, '1', 'Какие из этих фруктов Вы предпочитаете?', NULL, 'radio', NULL, NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
 VALUES (NULL, '1', '1', 'Яблоки'), (NULL, '1', '1', 'Груши');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalLink`, `FinalComment`)
+VALUES (2, '1', 'Какие яблоки вы любите больше?', NULL, 'radio', NULL, NULL, NULL);
+
+INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
+VALUES (NULL, '1', '2', 'Большие'), (NULL, '1', '2', 'Маленькие');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalLink`, `FinalComment`)
+VALUES (3, '1', 'Какие груши вы любите больше?', NULL, 'radio', NULL, NULL, NULL);
+
+INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
+VALUES (NULL, '1', '3', 'Твёрдые'), (NULL, '1', '3', 'Мягкие');
+
+-- Creating logic for the sample poll
+INSERT INTO `surveyzilla`.`Logic` (`PollId`, `ItemId`, `OptionId`, `NextItemId`)
+VALUES ('1', '1', '1', '2'), ('1', '1', '2', '3'), ('1', '2', '3', '0'), ('1', '2', '4', '0'), ('1', '3', '5', '0'), ('1', '3', '6', '0');
