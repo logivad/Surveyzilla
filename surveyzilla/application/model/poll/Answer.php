@@ -7,19 +7,19 @@ class Answer
     private $items=array();        // $items[itemId] = [customOption, option 1, option 2, ... option N]
 
     public function __construct($pollId){
-        $this -> pollId = $pollId;
+        $this->pollId = $pollId;
     }
     public function getPollId(){
-        return $this -> pollId;
+        return $this->pollId;
     }
     public function getToken(){
-        return $this -> token;
+        return $this->token;
     }
     public function setToken($token){
         $this->token = $token;
     }
     public function generateToken(){
-        $this -> token = md5(microtime().rand(100,999));
+        $this->token = md5(microtime().rand(100,999));
     }
     public function setItems(array $items){
         $this->items = $items;

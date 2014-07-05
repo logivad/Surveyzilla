@@ -5,15 +5,18 @@ class InternalUser extends User
     private $password;
     private $hash;
     
-    public function __construct(){
-        $this -> type = User::TYPE_INTERNAL;
+    public function __construct($id, $role, $regDate){
+        $this->id = $id;
+        $this->role = $role;
+        $this->regDate = $regDate;
+        $this->type = User::TYPE_INTERNAL;
     }
     public function getPassword(){
-        return $this -> password;
+        return $this->password;
     }
     public function setPassword($pw){
-        if ($this -> isValidPassword($pw)){
-            $this -> password = $pw;
+        if ($this->isValidPassword($pw)){
+            $this->password = $pw;
             return true;
         }
         return false;

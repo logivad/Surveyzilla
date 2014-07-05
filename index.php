@@ -6,10 +6,7 @@
 namespace surveyzilla\application;
 date_default_timezone_set('Europe/Kiev');
 function autoload($className){
-    $filename = str_replace('\\','/',$className).'.php';
-    if (file_exists($filename)){
-        require_once $filename;
-    }
+    require_once str_replace('\\','/',$className).'.php';
 }
 /**
  * Функция для рендеринга вида. Принимает аргумент - имя вида, без расширения
@@ -54,6 +51,7 @@ use surveyzilla\application\service\UserService,
     surveyzilla\application\controller\UserController,
     surveyzilla\application\controller\PollController,
     surveyzilla\application\dao\UserDAOFileCSV,
+    surveyzilla\application\dao\UserDaoMysql,
     surveyzilla\application\dao\PrivilegesDAOFileCSV,
     surveyzilla\application\dao\PollDAOFileCSV,
     surveyzilla\application\dao\LogicDAOFileCSV,
@@ -81,6 +79,10 @@ function ini_poll(){
 }
 // Действие, выполняемое по умолчанию - отображение главной страницы сайта
 if (empty($_REQUEST['action'])){
+    $userDao = UserDaoMysql::getInstance();
+    $user = $userDao->findUserById('1');
+    var_dump($user);
+    exit();
     ini_user();
     $ctrl = UserController::getInstance();
     $ctrl->setView(new \stdClass());

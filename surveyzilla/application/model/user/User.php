@@ -3,22 +3,20 @@ namespace surveyzilla\application\model\user;
 class User
 {
     // Типы пользователей
-    const TYPE_INTERNAL = 0;
-    const TYPE_SOCIAL_FB = 1;
-    const TYPE_SOCIAL_VK = 2;
-    const TYPE_SOCIAL_GP = 3;
+    const TYPE_INTERNAL = 'internal';
+    const TYPE_SOCIAL_FB = 'fb';
+    const TYPE_SOCIAL_VK = 'vk';
+    const TYPE_SOCIAL_GP = 'gp';
     protected $id;
     protected $name;
     protected $email;
     protected $type;
-    protected $roleset;
-    protected $pollList='';
+    protected $role;
+    protected $regDate;
+    protected $pollList=array();
 
     public function getId(){
-        return $this -> id;
-    }
-    public function setId($id){
-        $this->id = $id;
+        return $this->id;
     }
     public function getPollList(){
         return $this->pollList;
@@ -55,22 +53,22 @@ class User
         return true;
     }
     public function getName(){
-        return $this -> name;
+        return $this->name;
     }
     public function setName($name){
-        if ($this -> isValidName($name))
-            $this -> name = $name;
+        if ($this->isValidName($name))
+            $this->name = $name;
     }
     protected function isValidName($name){
         /*переделать*/
         return strlen($name) > 1;
     }
     public function getEmail(){
-        return $this -> email;
+        return $this->email;
     }
     public function setEmail($email){
-        if ($this -> isValidEmail($email)){
-            $this -> email = $email;
+        if ($this->isValidEmail($email)){
+            $this->email = $email;
             return true;
         }
         return false;
@@ -86,17 +84,14 @@ class User
         }
         return true;
     }
-    public function getRoleset(){
-        return $this->roleset;
+    public function getRole(){
+        return $this->role;
     }
-    public function setRoleset($role){
-        $this->roleset = $role;
+    public function setRole($role){
+        $this->role = $role;
     }
     public function getType(){
-        return $this -> type;
-    }
-    public function setType($type){
-        $this->type = $type;
+        return $this->type;
     }
     public function getTypeStr(){
         switch ($this->type){
@@ -108,13 +103,13 @@ class User
         return 'unknown_type';
     }
     public function getUserRole(){
-        return $this -> userRole;
+        return $this->userRole;
     }
     public function getUserRights(){
-        return $this -> userRights;
+        return $this->userRights;
     }
     public function isAdmin(){
-        return Role::getInstance()->isAdmin($this->roleset);
+        return Role::getInstance()->isAdmin($this->role);
     }
     public function setNewHash(){
         throw new \LogicException('Wrong type of User!');

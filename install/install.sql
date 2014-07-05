@@ -34,9 +34,11 @@ CREATE TABLE `PrivilegesByRole`
 CREATE TABLE `Users` (
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `RoleId` INT UNSIGNED NOT NULL,
+  `Type` ENUM('internal', 'vk', 'fb', 'gp') NOT NULL,
   `Email` CHAR(255) NOT NULL UNIQUE,
   `Name` CHAR(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `Password` CHAR(32) NOT NULL,
+  `Hash` CHAR(32),
   `RegDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     COMMENT 'Registration date',
   PRIMARY KEY (`Id`),
@@ -105,9 +107,11 @@ CREATE TABLE PollItems
   `ImagePath` CHAR(255),
   `InputType` ENUM('checkbox','radio','text') NOT NULL,
   `IsFinal` BOOLEAN
-    COMMENT 'Final item (page) does not have questions, it is used to communicate with a quizzee',
+    COMMENT 'Final item (page) does not have questions, it is used to 
+    communicate with a quizzee',
   `FinalLink` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci
-    COMMENT 'On competion of the poll the quizzee will be redirected according to this link',
+    COMMENT 'On competion of the poll the quizzee will be redirected according 
+    to this link',
   `FinalComment` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
   FOREIGN KEY (`PollId`) REFERENCES `Polls` (`Id`) ON DELETE CASCADE,
   PRIMARY KEY (`Id`)
@@ -200,17 +204,24 @@ CREATE TABLE FilterPollAllowUserId
 --    for initial initialization
 DROP PROCEDURE IF EXISTS `createUser`; 
 DELIMITER //
-CREATE PROCEDURE `createUser` (IN roleId INT, IN email VARCHAR(255), IN name VARCHAR(20) CHARSET utf8, IN pwd VARCHAR(32))
+CREATE PROCEDURE `createUser` (
+  IN roleId INT, 
+  IN type CHAR(10),
+  IN email CHAR(255), 
+  IN name CHAR(20) CHARSET utf8, 
+  IN pwd CHAR(32))
 BEGIN
     START TRANSACTION;
-    INSERT INTO `Users` (`Id`, `RoleId`, `Email`, `Name`, `Password`, `RegDate`)
-    VALUES (NULL, roleId, email, name, pwd, NULL);
+    INSERT INTO `Users` (`Id`, `RoleId`, `Type`, `Email`, `Name`, `Password`, `RegDate`)
+    VALUES (NULL, roleId, type, email, name, pwd, NULL);
 
     INSERT INTO `UserMetrics` (`UserId`, `PollsLeft`, `AnsLeft`, `PeriodEnd`)
     VALUES (
       (SELECT `Id` FROM `Users` WHERE `Users`.`Email` = email),
-      (SELECT `RateValue` FROM `RatesByRole` WHERE `RatesByRole`.`RoleId` = roleId AND `RatesByRole`.`RateParameter` = 'PollsLeft'),
-      (SELECT `RateValue` FROM `RatesByRole` WHERE `RatesByRole`.`RoleId` = roleId AND `RatesByRole`.`RateParameter` = 'AnsLeft'),
+      (SELECT `RateValue` FROM `RatesByRole` WHERE `RatesByRole`.`RoleId` = roleId 
+        AND `RatesByRole`.`RateParameter` = 'PollsLeft'),
+      (SELECT `RateValue` FROM `RatesByRole` WHERE `RatesByRole`.`RoleId` = roleId 
+        AND `RatesByRole`.`RateParameter` = 'AnsLeft'),
       (SELECT DATE_ADD(NOW(), INTERVAL 30 DAY))
     );
     COMMIT;
@@ -234,12 +245,12 @@ VALUES ('createPoll'), ('receiveAnswer');
 INSERT INTO `PrivilegesByRole` (`RoleId`, `PrivilegeId`)
 VALUES (1, 1), (1, 2);
 
--- Initial metrics for a given role (admin can create 100 polls and geather 1000 answers etc)
+-- Initial metrics for a given role (admin can create 100 polls etc)
 INSERT INTO `RatesByRole` (`RoleId`, `RateParameter`, `RateValue`)
 VALUES (1, 'PollsLeft', 100), (1, 'AnsLeft', 1000);
 
 -- Using a nice procedure to create the very first user
-CALL createUser(1, 'admin@surveyzilla.ru', 'Admin', MD5('l234'));
+CALL createUser(1, 'internal', 'admin@surveyzilla.ru', 'Admin', MD5('l234'));
 
 -- Creating a sample poll
 INSERT INTO `Polls` (`Id`, `UserId`, `Name`, `CreationDate`, `FiltersMask`)

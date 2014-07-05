@@ -1,27 +1,34 @@
 <?php
 namespace surveyzilla\application\service;
-use surveyzilla\application\model\user\User, surveyzilla\application\model\user\FBUser, surveyzilla\application\model\user\VKUser,
-surveyzilla\application\model\user\GPUser, surveyzilla\application\model\user\InternalUser;
+
+use LogicException;
+use surveyzilla\application\dao\UserDaoMysql;
+use surveyzilla\application\model\user\FBUser;
+use surveyzilla\application\model\user\GPUser;
+use surveyzilla\application\model\user\InternalUser;
+use surveyzilla\application\model\user\User;
+use surveyzilla\application\model\user\VKUser;
 class UserService
 {
     private static $_instance;
     private $userDAO;
     private $userPrivilegesDAO;
     private function __construct(){
-        /*пусто*/
+        
     }
     public static function getInstance(){
         if (null === self::$_instance){
             self::$_instance = new self();
+            self::$_instance->userDAO = UserDaoMysql::getInstance();
         }
         return self::$_instance;
     }
-    public function setUserDAO($dao){
-        $this->userDAO = $dao;
-    }
-    public function setUserPrivilegesDAO($dao){
-        $this->userPrivilegesDAO = $dao;
-    }
+//    public function setUserDAO($dao){
+//        $this->userDAO = $dao;
+//    }
+//    public function setUserPrivilegesDAO($dao){
+//        $this->userPrivilegesDAO = $dao;
+//    }
     public function findUserById($id){
         return $this->userDAO->findUserById($id);
     }
@@ -56,13 +63,6 @@ class UserService
         }
         return true;
     }
-    /*public function deleteAllUsers(){
-        if (false === $this->userDAO->deleteAllUsers() ||
-        false === $this->userPrivilegesDAO->deleteAllPrivileges()){
-            return false;
-        }
-        return true;
-    }*/
     public function authorize($email, $password){
         // Проверяет авторизацию пользователя по куки возвращает TRUE / FALSE
         $user = $this->userDAO->findUserByEmail($email);
@@ -144,22 +144,22 @@ class UserService
             return false;
         }
     }
-    public function createUserByType($type){
+    public function createUserByType($type, $id, $role, $regDate){
         switch ($type){
             case User::TYPE_SOCIAL_FB:
-                $user = new FBUser();
+                $user = new FBUser($id, $role, $regDate);
                 break;
             case User::TYPE_SOCIAL_VK:
-                $user = new VKUser();
+                $user = new VKUser($id, $role, $regDate);
                 break;
             case User::TYPE_SOCIAL_GP:
-                $user = new GPUser();
+                $user = new GPUser($id, $role, $regDate);
                 break;
             case User::TYPE_INTERNAL:
-                $user = new InternalUser();
+                $user = new InternalUser($id, $role, $regDate);
                 break;
             default:
-                throw new \LogicException('Invalid User type!');
+                throw new LogicException('Invalid User type!');
         }
         return $user;
     }
