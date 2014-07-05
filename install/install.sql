@@ -87,7 +87,9 @@ CREATE TABLE `Polls`
     COMMENT 'A name (title) for the poll',
   `CreationDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `FiltersMask` TINYINT UNSIGNED DEFAULT 0
-    COMMENT 'Bit musk, defines which filters are used',
+    COMMENT 'Bit mask, defines which filters are used',
+  `ReportingMask` TINYINT UNSIGNED DEFAULT 0
+    COMMENT 'Bit mask, defines What data to gather',
   FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE CASCADE,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB;
@@ -140,13 +142,52 @@ CREATE TABLE Logic
   PRIMARY KEY (`PollId`, `ItemId`, `OptionId`)
 ) ENGINE=InnoDB;
 
+-- If poll creator wishes, every answer of a registered quizzee is
+-- recorder here (this is set in Polls.ReportingMask)
+CREATE TABLE AnswersInternal
+(
+  `UserId` INT UNSIGNED NOT NULL,
+  `PollId` INT UNSIGNED NOT NULL,
+  `ItemId` INT UNSIGNED NOT NULL,
+  `OptionId` INT UNSIGNED NOT NULL,
+  `CustomText` VARCHAR(255),
+  FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
+  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`Id`),
+  FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`),
+  PRIMARY KEY (`UserId`, `PollId`, `ItemId`)
+) ENGINE=InnoDB;
 
+-- Accumulates answer of all quizzees (not only registered on the website)
+CREATE TABLE PollResults
+(
+  `PollId` INT UNSIGNED NOT NULL,
+  `ItemId` INT UNSIGNED NOT NULL,
+  `OptionId` INT UNSIGNED NOT NULL,
+  `VotesCount` INT UNSIGNED DEFAULT 0,
+  FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
+  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`Id`),
+  FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`),
+  PRIMARY KEY (`PollId`, `ItemId`, `OptionId`)
+) ENGINE=InnoDB;
 
+-- List of filters for poll
+CREATE TABLE Filters
+(
+  `Id` INT NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(30),
+  PRIMARY KEY (`Id`)
+);
 
-
-
-
-
+-- If this filter used, only registered users with given ID's
+-- are allowed to run the poll
+CREATE TABLE FilterPollAllowUserId
+(
+  `PollId` INT UNSIGNED NOT NULL,
+  `UserId` INT UNSIGNED NOT NULL,
+  FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
+  FOREIGN KEY (`UserId`) REFERENCES `Users`(`Id`),
+  PRIMARY KEY (`PollId`, `UserId`)
+);
 
 
 -- -----------------
