@@ -2,24 +2,28 @@
 namespace surveyzilla\application\controller;
 use surveyzilla\application\model\user\User,
     surveyzilla\application\model\user\Privileges,
-    surveyzilla\application\model\UI;
+    surveyzilla\application\view\UI,
+    surveyzilla\application\service\UserService;
 class UserController
 {
     private $service;
+    // Объект, содержащий входные параметры для функций контроллера:
     private $request;
+    // Объект для хранения необходимых для вида переменных:
     public $view;
     private static $_instance;
     private function __construct(){
-        /*пусто*/
+        $this->view = new \stdClass();
     }
     public static function getInstance() {
         if (null === self::$_instance) {
             self::$_instance = new self();
+            self::$_instance->service = UserService::getInstance();
         }
         return self::$_instance;
     }
-    public function setService($userService) {
-        $this->service = $userService;
+    public function setRequest($request){
+        $this->request = $request;
     }
     public function displayUser(){
         // Операцию может выполнить только соответствующий пользователь и админ,
@@ -74,16 +78,6 @@ class UserController
         $this->view->message = $this->service->deleteUser($this->request->getParam('id')) ? UI::$text['success'] : UI::$text['error'];
         return $this->view;
     }
-    /*public function deleteAllUsers(){
-        $this->view->message = $this->service->deleteAllUsers() ? UI::$text['success'] : UI::$text['error'];
-        return $this->view;
-    }*/
-    public function setRequest($request){
-        $this->request = $request;
-    }
-    public function setView($view){
-        $this->view = $view;
-    }
     public function showAdminPage(){
         $this->view->title = 'Admin page';
         $user = $this->service->isAuthorized();
@@ -110,7 +104,7 @@ class UserController
                 !$this->request->isSetParam('password')){
             $this->view->isAuthorized = false;
             $this->view->message = '';
-            $this->view->title = 'войти';
+            $this->view->title = UI::$text['log-in'];
             return $this->view;
         }
         // Если пользователь отправил данные для авторизации
@@ -136,7 +130,7 @@ class UserController
         }
     }
     public function showMainPage() {
-        $this->view->title = 'Главная';
+        $this->view->title = UI::$text['main_page'];
         return $this->service->isAuthorized($this->view);
     }
     public function showAccount() {

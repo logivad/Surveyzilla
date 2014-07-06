@@ -254,13 +254,13 @@ CALL createUser(1, 'internal', 'admin@surveyzilla.ru', 'Admin', MD5('l234'));
 
 -- Creating a sample poll
 INSERT INTO `Polls` (`Id`, `UserId`, `Name`, `CreationDate`, `FiltersMask`)
-VALUES (NULL, '1', 'Фрукты', NULL, '0');
+VALUES (NULL, '1', 'Apples', NULL, '0');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalLink`, `FinalComment`)
-VALUES (1, '1', 'Какие из этих фруктов Вы предпочитаете?', NULL, 'radio', NULL, NULL, NULL);
+VALUES (1, '1', 'Do you like apples?', NULL, 'radio', NULL, NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (NULL, '1', '1', 'Яблоки'), (NULL, '1', '1', 'Груши');
+VALUES (NULL, '1', '1', 'I do like them!'), (NULL, '1', '1', 'Not really'), (NULL, '1', '1', 'Only if they come from California ;)');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalLink`, `FinalComment`)
 VALUES (2, '1', 'Какие яблоки вы любите больше?', NULL, 'radio', NULL, NULL, NULL);

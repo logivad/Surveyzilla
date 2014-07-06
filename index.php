@@ -8,6 +8,14 @@ date_default_timezone_set('Europe/Kiev');
 function autoload($className){
     require_once str_replace('\\','/',$className).'.php';
 }
+spl_autoload_register('surveyzilla\application\autoload');
+
+use surveyzilla\application\service\UserService,
+    surveyzilla\application\service\PollService,
+    surveyzilla\application\model\Request,
+    surveyzilla\application\controller\UserController,
+    surveyzilla\application\controller\PollController,
+    surveyzilla\application\dao\UserDaoMysql;
 /**
  * Функция для рендеринга вида. Принимает аргумент - имя вида, без расширения
  * Используется для чтения вида в переменную $view->contents для дальнейшего
@@ -43,51 +51,15 @@ function render($view, $layoutName=null) {
         require_once "surveyzilla/application/layout/default.php";
     }
 }
-spl_autoload_register('surveyzilla\application\autoload');
-// разбираемся с пространствами имён
-use surveyzilla\application\service\UserService,
-    surveyzilla\application\service\PollService,
-    surveyzilla\application\model\Request,
-    surveyzilla\application\controller\UserController,
-    surveyzilla\application\controller\PollController,
-    surveyzilla\application\dao\UserDAOFileCSV,
-    surveyzilla\application\dao\UserDaoMysql,
-    surveyzilla\application\dao\PrivilegesDAOFileCSV,
-    surveyzilla\application\dao\PollDAOFileCSV,
-    surveyzilla\application\dao\LogicDAOFileCSV,
-    surveyzilla\application\dao\AnswerDAOFileCSV;
-/** Функции инициализации */
-// Для работы с юзерами
-function ini_user(){
-    UserController::getInstance()->setService(UserService::getInstance());
-    UserService::getInstance()->setUserDAO(UserDAOFileCSV::getInstance());
-    UserDAOFileCSV::getInstance()->setPath('surveyzilla/storage/usr/');
-    UserDAOFileCSV::getInstance()->setService(UserService::getInstance());
-    UserService::getInstance()->setUserPrivilegesDAO(PrivilegesDAOFileCSV::getInstance());
-    PrivilegesDAOFileCSV::getInstance()->setPath('surveyzilla/storage/usr/');
-}
-function ini_poll(){
-    PollController::getInstance()->setPollService(PollService::getInstance());
-    PollController::getInstance()->setUserService(UserService::getInstance());
-    PollService::getInstance()->setPollDAO(PollDAOFileCSV::getInstance());
-    PollDAOFileCSV::getInstance()->setPath('surveyzilla/storage/poll/');
-    PollService::getInstance()->setUserService(UserService::getInstance());
-    PollService::getInstance()->setAnswerDAO(AnswerDAOFileCSV::getInstance());
-    PollService::getInstance()->setLogicDAO(LogicDAOFileCSV::getInstance());
-    LogicDAOFileCSV::getInstance()->setPath('surveyzilla/storage/poll/logic/');
-    AnswerDAOFileCSV::getInstance()->setPath('surveyzilla/storage/poll/ans/');
-}
 // Действие, выполняемое по умолчанию - отображение главной страницы сайта
 if (empty($_REQUEST['action'])){
-    $userDao = UserDaoMysql::getInstance();
-    $user = $userDao->findUserById('1');
-    var_dump($user);
-    exit();
-    ini_user();
+    // Получаем указатель на объект контроллера
     $ctrl = UserController::getInstance();
-    $ctrl->setView(new \stdClass());
+    // Метод контроллера вернет объект с необходимыми для вида пеерменными
     $view = $ctrl->showMainPage();
+    // Рендеринг вида,  используем полученные переменные из $view
     $view->content = renderView('main');
+    // Конечный рендеринг страницы (вид внедряется в шаблон), вывод на экран
     render($view);
     exit();
 }
@@ -121,7 +93,6 @@ switch ($_REQUEST['action']){
         render($view);
         break;
     case 'authorize':
-        ini_user();
         $request = new Request();
         $request->setParams(array(
             'email' => filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL),
@@ -130,7 +101,6 @@ switch ($_REQUEST['action']){
             ));
         $ctrl = UserController::getInstance();
         $ctrl->setRequest($request);
-        $ctrl->setView(new \stdClass());
         $view = $ctrl->authorize();
         if (true === $view->isAuthorized){
             // Если уже авторизован, отправляем на личную страницу

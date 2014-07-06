@@ -1,5 +1,5 @@
 <?php
-namespace surveyzilla\application\model;
+namespace surveyzilla\application\view;
 abstract class UI
 {
     // Пока что просто запишем встречающиеся тексты сайта в массив прямо здесь
@@ -14,6 +14,7 @@ abstract class UI
         'view_poll' => 'Просмотреть опрос',
         'enterCustOp' => 'другое...',
         'poll_end' => 'Спасибо за участие!',
-        'poll_answered' => 'Вы уже отвечали на этот опрос'
+        'poll_answered' => 'Вы уже отвечали на этот опрос',
+        'main_page' => 'Главная'
     );
 }

@@ -37,11 +37,18 @@ class UserDaoMysql implements IUserDAO
         }
         return $dbh;
     }
-    public function findUserById($id){
-        $id = (int) $id;
-        $sql = "SELECT `Users`.`Id`, `Title` AS 'Role', `Type`, `Email`, `Name`, "
-             . "`Password`, `Hash`, `RegDate` FROM `Users` INNER JOIN `UserRoles` "
-             . "ON `RoleId` = `UserRoles`.`Id` AND `Users`.`Id` = $id";
+    public function findUser($searchBy, $needle){
+        if ($searchBy == 'id') {
+            $sql = "SELECT `Users`.`Id`, `Title` AS 'Role', `Type`, `Email`, `Name`, "
+                 . "`Password`, `Hash`, `RegDate` FROM `Users` INNER JOIN `UserRoles` "
+                 . "ON `RoleId` = `UserRoles`.`Id` AND `Users`.`Id` = $needle";
+        } elseif ($searchBy == 'email') {
+            $sql = "SELECT `Users`.`Id`, `Title` AS 'Role', `Type`, `Email`, `Name`, "
+                 . "`Password`, `Hash`, `RegDate` FROM `Users` INNER JOIN `UserRoles` "
+                 . "ON `RoleId` = `UserRoles`.`Id` AND `Users`.`Email` = '$needle'";
+        } else {
+            return false;
+        }
         $dbh = $this->connect();
         $userData = null;
         foreach($dbh->query($sql) as $userData) {}
@@ -66,7 +73,7 @@ class UserDaoMysql implements IUserDAO
             $user->setHash($userData['Hash']);
         }
         // Перечь опросов пользователя
-        $sql = "SELECT `Id`, `Name` FROM `Polls` WHERE `UserId` = $id";
+        $sql = "SELECT `Id`, `Name` FROM `Polls` WHERE `UserId` = {$userData['Id']}";
         $dbh = $this->connect();
         $pollList = array();
         foreach($dbh->query($sql) as $record) {
@@ -76,7 +83,6 @@ class UserDaoMysql implements IUserDAO
         $user->setPollList($pollList);
         return $user;
     }
-    
     private function saveUsersToFile(&$arr){
         if (false === $handle = fopen($this->path.'users.csv','w')){
             throw new \RuntimeException('Error updating CSV file');
@@ -203,37 +209,5 @@ class UserDaoMysql implements IUserDAO
         }
         return $file;
     }
-    public function findUserByEmail($email){
-        if (!isset($this->path)){
-            throw new \LogicException('Cannot find User, path to CSV file is not set');
-        }
-        if (!file_exists($this->path.'users.csv')){
-            return false;
-        }
-        if (false === $file = file($this->path.'users.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)){
-            return false;
-            //throw new \Exception('Cannot read CSV file');
-        }
-        foreach ($file as $userLine){
-            $userData = str_getcsv($userLine);
-            if ($userData[2] == $email){
-                // Нашли данные пользователя в файле, создаем объект
-                $user = $this->service->createUserByType($userData[3]);
-                // Инициализируем пользователя (общие свойства)
-                $user->setId($userData[0]);
-                $user->setName($userData[1]);
-                $user->setEmail($userData[2]);
-                $user->setType($userData[3]);
-                $user->setRoleset($userData[4]);
-                // Только у InternalUser есть пароль, установим его
-                if ($user->getType() == User::TYPE_INTERNAL){
-                    $user->setPassword($userData[5]);
-                    $user->setHash($userData[7]);
-                }
-                $user->setPollList($userData[6]);
-                return $user;
-            }
-        }
-        return false;
-    }
+
 }

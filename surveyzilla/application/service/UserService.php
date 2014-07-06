@@ -13,6 +13,7 @@ class UserService
     private static $_instance;
     private $userDAO;
     private $userPrivilegesDAO;
+    private $passwordSalt = 'jge0e7a6g';
     private function __construct(){
         
     }
@@ -64,7 +65,7 @@ class UserService
         return true;
     }
     public function authorize($email, $password){
-        // Проверяет авторизацию пользователя по куки возвращает TRUE / FALSE
+        // Производит авторизацию пользователя по куки возвращает TRUE / FALSE
         $user = $this->userDAO->findUserByEmail($email);
         if ($user === false || !$password){
             return false;

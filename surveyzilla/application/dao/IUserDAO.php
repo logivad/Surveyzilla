@@ -7,6 +7,5 @@ interface IUserDAO
     public function addUser(User $user);
     public function updateUser(User $user);
     public function deleteUser($id);
-    public function findUserById($id);
-    public function findUserByEmail($id);
+    public function findUser($searchBy, $needle);
 }
