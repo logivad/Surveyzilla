@@ -1,19 +1,21 @@
 <?php
 namespace surveyzilla\application\controller;
-use surveyzilla\application\model\user\User,
-    surveyzilla\application\model\user\Privileges,
-    surveyzilla\application\view\UI,
-    surveyzilla\application\service\UserService;
+
+use surveyzilla\application\model\user\Privileges;
+use surveyzilla\application\model\user\User;
+use surveyzilla\application\service\UserService;
+use surveyzilla\application\view\UI;
+use surveyzilla\application\model\View;
 class UserController
 {
     private $service;
     // Объект, содержащий входные параметры для функций контроллера:
     private $request;
     // Объект для хранения необходимых для вида переменных:
-    public $view;
+    private $view;
     private static $_instance;
     private function __construct(){
-        $this->view = new \stdClass();
+        $this->view = new View();
     }
     public static function getInstance() {
         if (null === self::$_instance) {
@@ -24,6 +26,9 @@ class UserController
     }
     public function setRequest($request){
         $this->request = $request;
+    }
+    public function setView($view){
+        $this->view = $view;
     }
     public function displayUser(){
         // Операцию может выполнить только соответствующий пользователь и админ,
@@ -134,7 +139,7 @@ class UserController
         return $this->service->isAuthorized($this->view);
     }
     public function showAccount() {
-        $this->veiw->title = 'Личный кабинет';
+        $this->view->title = 'Личный кабинет';
         return $this->service->isAuthorized($this->view);
     }
     public function addUser(){
