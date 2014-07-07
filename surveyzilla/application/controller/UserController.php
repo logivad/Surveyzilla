@@ -115,7 +115,7 @@ class UserController
             /* Далее фронт-контроллер отобразит личную страницу пользоватлея,
              * поэтому запишем данные пользователя в объект вида
              */
-            $user = $this->service->findUserByEmail($this->request->getParam('email'));
+            $user = $this->service->findUser('email', $this->request->getParam('email'));
             if ($user->isAdmin()) {
                 $this->view->isAdmin = true;
             }

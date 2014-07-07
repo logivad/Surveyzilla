@@ -2,7 +2,7 @@
 namespace surveyzilla\application\service;
 
 use LogicException;
-use surveyzilla\application\dao\UserDaoMysql;
+use surveyzilla\application\dao\UserDAOMySQL;
 use surveyzilla\application\model\user\FBUser;
 use surveyzilla\application\model\user\GPUser;
 use surveyzilla\application\model\user\InternalUser;
@@ -20,7 +20,7 @@ class UserService
     public static function getInstance(){
         if (null === self::$_instance){
             self::$_instance = new self();
-            self::$_instance->userDAO = UserDaoMysql::getInstance();
+            self::$_instance->userDAO = UserDAOMySQL::getInstance();
         }
         return self::$_instance;
     }
@@ -30,17 +30,14 @@ class UserService
 //    public function setUserPrivilegesDAO($dao){
 //        $this->userPrivilegesDAO = $dao;
 //    }
-    public function findUserById($id){
-        return $this->userDAO->findUserById($id);
+    public function findUser($searchBy, $needle){
+        return $this->userDAO->findUser($searchBy, $needle);
     }
     public function getAllUsers(){
         return $this->userDAO->getAllUsers();
     }
     public function getUserTypeById($id){
         return $this->userDAO->getUserTypeById($id);
-    }
-    public function findUserByEmail($email){
-        return $this->userDAO->findUserByEmail($email);
     }
     public function findUserPrivilegesById($id){
         return $this->userPrivilegesDAO->findUserPrivilegesById($id);
@@ -66,11 +63,15 @@ class UserService
     }
     public function authorize($email, $password){
         // Производит авторизацию пользователя по куки возвращает TRUE / FALSE
-        $user = $this->userDAO->findUserByEmail($email);
+        $user = $this->userDAO->findUser('email', $email);
         if ($user === false || !$password){
             return false;
         }
-        if ($user->getPassword() === md5(md5($password))){
+        var_dump($password);
+        var_dump($user->getPassword());
+        //var_dump(md5($this->passwordSalt.md5($password)));
+        // Если пароль введен верно
+        if ($user->getPassword() === $password){
             // генерируем хэш и устанавливаем куки
             $user->setNewHash();
             $this->userDAO->updateUser($user);
@@ -96,7 +97,7 @@ class UserService
          * о пользователе. Объект $data должен быть stdClass
          */
         if (isset($_COOKIE['uid']) && isset($_COOKIE['hash'])){
-            if (false === $user = $this->userDAO->findUserById($_COOKIE['uid'])){
+            if (false === $user = $this->userDAO->findUser('id', $_COOKIE['uid'])){
                 if ($data !== null){
                     return $data;
                 }

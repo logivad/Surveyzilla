@@ -15,7 +15,7 @@ use surveyzilla\application\service\UserService,
     surveyzilla\application\model\Request,
     surveyzilla\application\controller\UserController,
     surveyzilla\application\controller\PollController,
-    surveyzilla\application\dao\UserDaoMysql;
+    surveyzilla\application\dao\UserDAOMySQL;
 /**
  * Функция для рендеринга вида. Принимает аргумент - имя вида, без расширения
  * Используется для чтения вида в переменную $view->contents для дальнейшего
@@ -77,7 +77,6 @@ switch ($_REQUEST['action']){
         render($view);
         break;
     case 'account':
-        ini_user();
         $ctrl = UserController::getInstance();
         $ctrl->setView(new \stdClass());
         $view = $ctrl->showAccount();
@@ -116,9 +115,7 @@ switch ($_REQUEST['action']){
         render($view);
         break;
     case 'quit':
-        ini_user();
         $ctrl = UserController::getInstance();
-        $ctrl->setView(new \stdClass());
         $view = $ctrl->authorize(true);
         if ($view->loggedOff){
             // Пользователь вышел, перенаправляем на страницу входа

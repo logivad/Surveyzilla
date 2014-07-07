@@ -2,18 +2,15 @@
 namespace surveyzilla\application\dao;
 use surveyzilla\application\model\user\User,
     surveyzilla\application\model\user\Role,
-    surveyzilla\application\service\UserService;
-class UserDaoMysql implements IUserDAO
+    surveyzilla\application\service\UserService,
+    surveyzilla\application\Config,
+    surveyzilla\application\dao\DbConnection;
+class UserDAOMySQL implements IUserDAO
 {
-    private $connectionData;
     private $service;
     private static $_instance;
     
-    private function __construct(){
-        // Reading DB connection parameters from configuration file
-        require_once $_SERVER['DOCUMENT_ROOT'].'/surveyzilla/config.php';
-        $this->connectionData = $connection;
-    }
+    private function __construct(){}
     public static function getInstance(){
         if (null === self::$_instance){
             self::$_instance = new self();
@@ -24,18 +21,6 @@ class UserDaoMysql implements IUserDAO
     
     public function setService(UserService $srv){
         $this->service = $srv;
-    }
-    public function connect() {
-        try {
-            $dbh = new \PDO(
-                "mysql:host={$this->connectionData['host']};dbname={$this->connectionData['db']}",
-                $this->connectionData['user'],
-                $this->connectionData['pass']
-            );
-        } catch (\PDOException $ex) {
-            throw new \Exception('Database connection failed');
-        }
-        return $dbh;
     }
     public function findUser($searchBy, $needle){
         if ($searchBy == 'id') {
@@ -49,12 +34,10 @@ class UserDaoMysql implements IUserDAO
         } else {
             return false;
         }
-        $dbh = $this->connect();
-        $userData = null;
-        foreach($dbh->query($sql) as $userData) {}
-        $dbh = null;
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->query($sql);
+        $userData = $stmt->fetch(\PDO::FETCH_ASSOC);
         if (empty($userData)) {
-            // User not found
             return false;
         }
         // Создаем объект User
@@ -74,9 +57,8 @@ class UserDaoMysql implements IUserDAO
         }
         // Перечь опросов пользователя
         $sql = "SELECT `Id`, `Name` FROM `Polls` WHERE `UserId` = {$userData['Id']}";
-        $dbh = $this->connect();
         $pollList = array();
-        foreach($dbh->query($sql) as $record) {
+        foreach($dbh->query($sql, \PDO::FETCH_ASSOC) as $record) {
             $pollList[$record['Id']] = $record['Name'];
         }
         $dbh = null;
@@ -135,33 +117,18 @@ class UserDaoMysql implements IUserDAO
         return true;
     }
     public function updateUser(User $user){
-        if (!isset($this->path)){
-            throw new \LogicException('Cannot save User, path to CSV file is not set');
-        }
         if (!$user->isValidUser()){
             throw new \LogicException('Cannot save User, user data is not correct');
         }
-        if (file_exists($this->path.'users.csv')){
-            // Если файл с данными пользователей уже есть, то обновляем данные пользователя
-            if (false === $file = file($this->path.'users.csv',FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)){
-                throw new \RuntimeException('Error opening CSV file');
-            }
-            for ($userLine=0, $size=sizeof($file); $userLine<$size; $userLine++){
-                $userData = str_getcsv($file[$userLine]);
-                if ($userData[0] == $user->getId()){
-                    // Пользователь найден в базе (id - нулевое поле)
-                    $file[$userLine] = $user->toCSV();
-                    // Обновляем данные пользователя в файле
-                    $this->saveUsersToFile($file);
-                    return true;
-                }
-            }
-            // Пользователь не найден
-            return false;
-        } else {
-            // Если файла с базой пользователей нет - ошибка
-            throw new \Exception('CSV file not found. If this user is the first one, use addUser() instead');
-        }
+        $sql = "UPDATE Users SET "
+             . "`Email` = '{$user->getEmail()}', "
+             . "`Name` = '{$user->getName()}', "
+             . "`Password` = '{$user->getPassword()}', "
+             . "`Hash` = '{$user->getHash()}' "
+             . "WHERE `Id` = {$user->getId()}";
+        $dbh = DbConnection::getInstance()->getHandler();
+        $dbh->exec($sql);
+        $dbh = null;
     }
     public function deleteUser($id){
         if (!isset($this->path)){

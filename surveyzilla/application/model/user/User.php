@@ -109,7 +109,7 @@ class User
         return $this->userRights;
     }
     public function isAdmin(){
-        return Role::getInstance()->isAdmin($this->role);
+        return ($this->role === 'admin') ? true : false;
     }
     public function setNewHash(){
         throw new \LogicException('Wrong type of User!');

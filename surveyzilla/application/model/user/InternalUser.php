@@ -34,9 +34,10 @@ class InternalUser extends User
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHI JKLMNOPRQSTUVWXYZ0123456789";
         $this->hash = "";
         $clen = strlen($chars) - 1;
-        while (strlen($this->hash) < 10) {
+        while (strlen($this->hash) < 20) {
             $this->hash .= $chars[mt_rand(0,$clen)];  
         }
+        $this->hash = md5($this->hash);
     }
     public function isValiduser(){
         if (false === $this->isValidName($this->name) ||

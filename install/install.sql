@@ -1,3 +1,5 @@
+CREATE DATABASE surveyzilla DEFAULT CHARACTER SET utf8;
+
 -- -------------
 --   TABLES   --
 -- -------------
@@ -36,7 +38,7 @@ CREATE TABLE `Users` (
   `RoleId` INT UNSIGNED NOT NULL,
   `Type` ENUM('internal', 'vk', 'fb', 'gp') NOT NULL,
   `Email` CHAR(255) NOT NULL UNIQUE,
-  `Name` CHAR(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `Name` CHAR(20) NOT NULL,
   `Password` CHAR(32) NOT NULL,
   `Hash` CHAR(32),
   `RegDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -85,7 +87,7 @@ CREATE TABLE `Polls`
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `UserId` INT UNSIGNED NOT NULL
     COMMENT 'Poll creator. Equals zero for temporary users',
-  `Name` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL
+  `Name` CHAR(255) NOT NULL
     COMMENT 'A name (title) for the poll',
   `CreationDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `FiltersMask` TINYINT UNSIGNED DEFAULT 0
@@ -103,16 +105,16 @@ CREATE TABLE PollItems
 (
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `PollId` INT UNSIGNED NOT NULL,
-  `QuestionText` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `QuestionText` CHAR(255) NOT NULL,
   `ImagePath` CHAR(255),
   `InputType` ENUM('checkbox','radio','text') NOT NULL,
   `IsFinal` BOOLEAN
     COMMENT 'Final item (page) does not have questions, it is used to 
     communicate with a quizzee',
-  `FinalLink` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci
+  `FinalLink` CHAR(255)
     COMMENT 'On competion of the poll the quizzee will be redirected according 
     to this link',
-  `FinalComment` VARCHAR(1000) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+  `FinalComment` VARCHAR(1000),
   FOREIGN KEY (`PollId`) REFERENCES `Polls` (`Id`) ON DELETE CASCADE,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB;
@@ -125,7 +127,7 @@ CREATE TABLE ItemOptions
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `PollId` INT UNSIGNED NOT NULL,
   `ItemId` INT UNSIGNED NOT NULL,
-  `OptionText` CHAR(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `OptionText` CHAR(255) NOT NULL,
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`),
   FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`Id`) ON DELETE CASCADE,
   PRIMARY KEY (`Id`)
@@ -250,7 +252,7 @@ INSERT INTO `RatesByRole` (`RoleId`, `RateParameter`, `RateValue`)
 VALUES (1, 'PollsLeft', 100), (1, 'AnsLeft', 1000);
 
 -- Using a nice procedure to create the very first user
-CALL createUser(1, 'internal', 'admin@surveyzilla.ru', 'Admin', MD5('l234'));
+CALL createUser(1, 'internal', 'admin@surveyzilla.ru', 'Admin', MD5(CONCAT(MD5('l234rt'), 'jge0e7a6g')));
 
 -- Creating a sample poll
 INSERT INTO `Polls` (`Id`, `UserId`, `Name`, `CreationDate`, `FiltersMask`)
