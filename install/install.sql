@@ -252,7 +252,7 @@ INSERT INTO `RatesByRole` (`RoleId`, `RateParameter`, `RateValue`)
 VALUES (1, 'PollsLeft', 100), (1, 'AnsLeft', 1000);
 
 -- Using a nice procedure to create the very first user
-CALL createUser(1, 'internal', 'admin@surveyzilla.ru', 'Admin', MD5(CONCAT(MD5('l234rt'), 'jge0e7a6g')));
+CALL createUser(1, 'internal', 'admin@surveyzilla.ru', 'Admin', MD5(CONCAT('x9gZhq!pgh','l234rt')));
 
 -- Creating a sample poll
 INSERT INTO `Polls` (`Id`, `UserId`, `Name`, `CreationDate`, `FiltersMask`)

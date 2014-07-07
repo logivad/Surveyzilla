@@ -9,4 +9,5 @@ class Config
     public static $dbName = 'surveyzilla';
     public static $dbUser = 'sz';
     public static $dbPass = 'Zv2yTXstX9RMpanZ';
+    public static $dbPassSalt = 'x9gZhq!pgh';
 }

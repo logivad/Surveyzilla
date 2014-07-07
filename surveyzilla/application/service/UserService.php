@@ -2,6 +2,7 @@
 namespace surveyzilla\application\service;
 
 use LogicException;
+use surveyzilla\application\Config;
 use surveyzilla\application\dao\UserDAOMySQL;
 use surveyzilla\application\model\user\FBUser;
 use surveyzilla\application\model\user\GPUser;
@@ -13,7 +14,6 @@ class UserService
     private static $_instance;
     private $userDAO;
     private $userPrivilegesDAO;
-    private $passwordSalt = 'jge0e7a6g';
     private function __construct(){
         
     }
@@ -67,11 +67,8 @@ class UserService
         if ($user === false || !$password){
             return false;
         }
-        var_dump($password);
-        var_dump($user->getPassword());
-        //var_dump(md5($this->passwordSalt.md5($password)));
         // Если пароль введен верно
-        if ($user->getPassword() === $password){
+        if ($user->getPassword() === md5(Config::$dbPassSalt.$password)){
             // генерируем хэш и устанавливаем куки
             $user->setNewHash();
             $this->userDAO->updateUser($user);
