@@ -49,7 +49,8 @@ class FrontController
      * @param type $layoutName Name of used layout from application/layout
      */
     private function renderPage($view, $layoutName=null) {
-    if (isset($layoutName) && file_exists("surveyzilla/application/layout/$layoutName.php")) {
+    if (isset($layoutName) 
+        && file_exists("surveyzilla/application/layout/$layoutName.php")) {
             require_once "surveyzilla/application/layout/$layoutName.php";
         } else {
             require_once "surveyzilla/application/layout/default.php";
@@ -150,6 +151,34 @@ class FrontController
             $host  = $_SERVER['HTTP_HOST'];
             $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
             header("Location: http://$host$uri/index.php?a=login");
+        }
+    }
+    /**
+     * Runs the poll.
+     * 
+     * Firstly, user receives a token. This token is sent to the server with every
+     * answer. Answers are stored in a temporary file on the server untill poll
+     * is finished. When poll is finished (answered), this file is deleted and
+     * answers are sent to the database.
+     * 
+     * Parameters for this action:
+     * 
+     *      poll        - poll Id in database
+     *      item        - item Id of the poll
+     *      custopt     - user's custom option
+     *      opts        - selected options
+     */
+    private function actionRun() {
+        $this->request->filterPollRunParams();
+        $ctrl = PollController::getInstance();
+        $ctrl->setRequest($this->request);
+        $view = $ctrl->runPoll();
+        if (isset($view->message)) {
+            $view->content = $this->renderView('message', $view);
+            $this->renderPage($view, 'runPoll');
+        } else {
+            $view->content = $this->renderView('runPoll', $view);
+            $this->renderPage($view, 'runPoll');
         }
     }
 }
