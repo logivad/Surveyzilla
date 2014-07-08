@@ -73,4 +73,22 @@ class Request
             array('options'=>array('regexp'=>'/[a-zA-Z0-9_!-.]{6,}/'))
         );
     }
+    /**
+     * Filters request parameters used for poll running
+     * @return null
+     */
+    public function filterPollRunParams() {
+        if (isset($this->params['poll'])) {
+            $this->params['poll'] = \filter_var($this->params['poll'], FILTER_VALIDATE_INT);
+        }
+        if (isset($this->params['item'])) {
+            $this->params['item'] = \filter_var($this->params['item'], FILTER_VALIDATE_INT);
+        }
+        if (isset($this->params['custopt'])) {
+            $this->params['custopt'] = \filter_var($this->params['custopt'], FILTER_SANITIZE_SPECIAL_CHARS);
+        }
+        if (isset($this->params['opts'])) {
+            $this->params['opts'] = \filter_var_array($this->params['opts'], FILTER_SANITIZE_SPECIAL_CHARS);
+        }
+    }
 }
