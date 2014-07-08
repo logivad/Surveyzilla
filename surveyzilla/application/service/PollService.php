@@ -61,6 +61,7 @@ class PollService
         return $this->logicDAO->findLogic($id);
     }
     public function isUniqueUser($pollId, $token){
+        return false;
         if ($this->pollDAO->isUsedToken($pollId, $token)){
             return false;
         }

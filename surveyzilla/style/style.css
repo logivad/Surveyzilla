@@ -6,12 +6,21 @@
     padding: 10px;
     margin-bottom: 10px;
 }
+#box_centered {
+    display: block;
+    width: 1000px;
+    border-radius: 5px;
+    border: 1px solid #888888;
+    padding: 10px;
+    margin: auto;
+}
 #message {
-    display: inline-block;
+    display: block;
+    width: 300px;
     border-radius: 5px;
     border: 2px solid #ff0000;
     padding: 10px;
-    margin: 0;
+    margin: auto;
 }
 h1 {
     color: darkblue;

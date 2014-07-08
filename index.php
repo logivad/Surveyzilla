@@ -1,130 +1,29 @@
 <?php
-/**
- * Front controller
- * 
- */
+
 namespace surveyzilla\application;
+use surveyzilla\application\controller\FrontController;
+
 date_default_timezone_set('Europe/Kiev');
+
+// Autoloader (each class is located in a directory according to it's namespace)
 function autoload($className){
     require_once str_replace('\\','/',$className).'.php';
 }
 spl_autoload_register('surveyzilla\application\autoload');
 
-use surveyzilla\application\service\UserService,
-    surveyzilla\application\service\PollService,
-    surveyzilla\application\model\Request,
-    surveyzilla\application\controller\UserController,
-    surveyzilla\application\controller\PollController,
-    surveyzilla\application\dao\UserDAOMySQL;
-/**
- * Функция для рендеринга вида. Принимает аргумент - имя вида, без расширения
- * Используется для чтения вида в переменную $view->contents для дальнейшего
- * включения в шаблон (по умолчанию - layout/default.php)
- */
-function renderView($viewName, $view=null) {
-    // Если не найден файл вида, выдаем сообщение об ошибки и ответ 403
-    if (!file_exists("surveyzilla/application/view/$viewName.php")) {
-        http_response_code(404);
-        $view = new \stdClass();
-        $view->message = 'Странно.. страница не отобразилась';
-        return renderView('message', $view);
-    }
-    // Формируем содержание страницы (будет включено в шаблон)
-    ob_start();
-    require_once "surveyzilla/application/view/$viewName.php";
-    $content = ob_get_contents();
-    ob_end_clean();
-    return $content;
-}
-/**
- * Функция для конечного отображения страницы. Использует шаблон с именем,
- * указанным в параметре $layoutName (если задан). По умолчанию используется
- * шаблон default. В шаблон должен быть передан:
- *      $view - объект, содержащий необходимую странице информацию.
- * Он должен содержать:
- *      $viw->content - содержимое страницы, сгенерированное функцией renderView
- */
-function render($view, $layoutName=null) {
-    if ($layoutName && file_exists("surveyzilla/application/layout/$layoutName.php")) {
-        require_once "surveyzilla/application/layout/$layoutName.php";
-    } else {
-        require_once "surveyzilla/application/layout/default.php";
-    }
-}
-// Действие, выполняемое по умолчанию - отображение главной страницы сайта
-if (empty($_REQUEST['action'])){
-    // Получаем указатель на объект контроллера
-    $ctrl = UserController::getInstance();
-    // Метод контроллера вернет объект с необходимыми для вида пеерменными
-    $view = $ctrl->showMainPage();
-    // Рендеринг вида,  используем полученные переменные из $view
-    $view->content = renderView('main');
-    // Конечный рендеринг страницы (вид внедряется в шаблон), вывод на экран
-    render($view);
-    exit();
-}
-switch ($_REQUEST['action']){
+// Front controller receives $_REQUEST, looks at it's 'a' (action) value and
+// tries to launch corresponding action
+$fc = new FrontController($_REQUEST);
+
+
+/*switch ($_REQUEST['action']){
     case 'showAdminPage':
-        ini_user();
         $ctrl = UserController::getInstance();
         $ctrl->setView(new \stdClass());
         $view = $ctrl->showAdminPage();
         if (!empty($view->isAdmin)){
             $view->content = renderView('admin', $view);
         } else {
-            $view->content = renderView('message', $view);
-        }
-        render($view);
-        break;
-    case 'account':
-        $ctrl = UserController::getInstance();
-        $ctrl->setView(new \stdClass());
-        $view = $ctrl->showAccount();
-        if (true === $view->isAuthorized){
-            $view->content = renderView('account', $view);
-        } else {
-            // Если пользователь не авторизован, перенаправим на страницу входа
-            $host  = $_SERVER['HTTP_HOST'];
-            $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-            header("Location: http://$host$uri/index.php?action=authorize");
-            exit;
-        }
-        render($view);
-        break;
-    case 'authorize':
-        $request = new Request();
-        $request->setParams(array(
-            'email' => filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL),
-            'password' => filter_input(INPUT_POST, 'password', FILTER_VALIDATE_REGEXP,
-                    array('options'=>array('regexp'=>'/[a-zA-Z0-9_!-.]{6,}/')))
-            ));
-        $ctrl = UserController::getInstance();
-        $ctrl->setRequest($request);
-        $view = $ctrl->authorize();
-        if (true === $view->isAuthorized){
-            // Если уже авторизован, отправляем на личную страницу
-            $host  = $_SERVER['HTTP_HOST'];
-            $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-            header("Location: http://$host$uri/index.php?action=account");
-            exit;
-        } else {
-            // Если не авторизован (зашел первый раз, неверно ввел данные и т.д.),
-            // отобразим страницу входа еще раз
-            $view->content = renderView('authorize', $view);
-        }
-        render($view);
-        break;
-    case 'quit':
-        $ctrl = UserController::getInstance();
-        $view = $ctrl->authorize(true);
-        if ($view->loggedOff){
-            // Пользователь вышел, перенаправляем на страницу входа
-            $host  = $_SERVER['HTTP_HOST'];
-            $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-            header("Location: http://$host$uri/index.php?action=authorize");
-            exit;
-        } else {
-            $view->message = 'Ошибка!';
             $view->content = renderView('message', $view);
         }
         render($view);
@@ -196,8 +95,6 @@ switch ($_REQUEST['action']){
     case 'displayAllUsers':
         require_once 'surveyzilla/application/view/header.php';
         ini_user();
-        /**$request = new Request();
-        $request->setParam('id',$_POST['id']);*/
         $ctrl = UserController::getInstance();
         //$ctrl->setRequest($request);
         $ctrl->setView(new \stdClass());
@@ -255,32 +152,24 @@ switch ($_REQUEST['action']){
         require_once 'surveyzilla/application/view/displayPoll.php';
         break;
     case 'run':
-        ini_user();
-        ini_poll();
         $request = new Request();
         $request->setParams(array(
-            'pollId' => isset($_REQUEST['pollId']) ? filter_var($_REQUEST['pollId'], FILTER_VALIDATE_INT): null,
+            'pollId' => isset($_REQUEST['poll']) ? filter_var($_REQUEST['poll'], FILTER_VALIDATE_INT): null,
             'token' => isset($_COOKIE['token']) ? $_COOKIE['token'] : null,
-            'itemId' => isset($_REQUEST['itemId']) ? filter_var($_REQUEST['itemId'], FILTER_VALIDATE_INT) : null,
+            'itemId' => isset($_REQUEST['item']) ? filter_var($_REQUEST['item'], FILTER_VALIDATE_INT) : null,
             'customOption' => isset($_REQUEST['customOption']) ? filter_var($_REQUEST['customOption'], FILTER_SANITIZE_SPECIAL_CHARS) : null,
             'options' => isset($_REQUEST['options']) ? filter_var_array($_REQUEST['options'], FILTER_SANITIZE_SPECIAL_CHARS) : null
             ));
         $ctrl = PollController::getInstance();
         $ctrl->setRequest($request);
-        $ctrl->setView(new \stdClass());
-        $ctrl->runPoll();
-        break;
-    case 'help':
-        require_once 'surveyzilla/application/view/header.php';
-        require_once 'surveyzilla/application/help/help.php';
-        break;
-    default;
-        // Page not found!
-        // Sending a proper response and showing 404 message
-        http_response_code(404);
-        $view = new \stdClass();
-        $view->title = 'Not found';
-        $view->content = renderView('404');
-        render($view);
-        exit();
-}
+        $view = $ctrl->runPoll();
+        if (isset($view->message)) {
+            $view->content = renderView('message', $view);
+            render($view, 'runPoll');
+            break;
+        } else {
+            $view->content = renderView('runPoll', $view);
+            render($view, 'runPoll');
+            break;
+        }
+}*/

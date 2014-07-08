@@ -3,7 +3,11 @@ namespace surveyzilla\application\controller;
 use surveyzilla\application\model\poll\Logic,
     surveyzilla\application\model\poll\Item,
     surveyzilla\application\model\poll\Options,
-    surveyzilla\application\model\UI;
+    surveyzilla\application\view\UI,
+    surveyzilla\application\model\View,
+    surveyzilla\application\service\UserService,
+    surveyzilla\application\service\PollService;
+
 class PollController
 {
     private $pollService;
@@ -12,19 +16,18 @@ class PollController
     private $view;
     private static $_instance;
     private function __construct(){
-        /*пусто*/
+        $this->view = new View();
     }
     public static function getInstance(){
         if (null === self::$_instance){
             self::$_instance = new self();
+            self::$_instance->userService = UserService::getInstance();
+            self::$_instance->pollService = PollService::getInstance();
         }
         return self::$_instance;
     }
     public function setPollService($pollService){
         $this->pollService = $pollService;
-    }
-    public function setUserService($srv){
-        $this->userService = $srv;
     }
     public function addPoll(){
         // Добавить опрос может лишь авторизованный пользователь
@@ -81,10 +84,7 @@ class PollController
         }
         if (!$this->pollService->isUniqueUser($pollId, $r->getParam('token'))){
             $this->view->message = UI::$text['poll_answered'];
-            $view = $this->view;
-            require_once 'surveyzilla/application/view/header.php';
-            require_once 'surveyzilla/application/view/message.php';
-            exit();
+            return $this->view;
         }
         if (empty($r->getParam('token'))){
             // новый опрашиваемый (еще не имеет талона)

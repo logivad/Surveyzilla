@@ -1,11 +1,11 @@
 <?php
 namespace surveyzilla\application\controller;
+use surveyzilla\application\model\user\Privileges,
+    surveyzilla\application\model\user\User,
+    surveyzilla\application\service\UserService,
+    surveyzilla\application\view\UI,
+    surveyzilla\application\model\View;
 
-use surveyzilla\application\model\user\Privileges;
-use surveyzilla\application\model\user\User;
-use surveyzilla\application\service\UserService;
-use surveyzilla\application\view\UI;
-use surveyzilla\application\model\View;
 class UserController
 {
     private $service;
@@ -113,14 +113,14 @@ class UserController
             return $this->view;
         }
         // Если пользователь отправил данные для авторизации
-        if ($this->service->authorize($this->request->getParam('email'), $this->request->getParam('password'))){
+        if ($this->service->authorize($this->request->get('email'), $this->request->get('password'))){
             // Пользователь успешно авторизован
             $this->view->isAuthorized = true;
             //$this->view->message = UI::$text['success'];
             /* Далее фронт-контроллер отобразит личную страницу пользоватлея,
              * поэтому запишем данные пользователя в объект вида
              */
-            $user = $this->service->findUser('email', $this->request->getParam('email'));
+            $user = $this->service->findUser('email', $this->request->get('email'));
             if ($user->isAdmin()) {
                 $this->view->isAdmin = true;
             }

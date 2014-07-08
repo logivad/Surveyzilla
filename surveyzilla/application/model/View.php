@@ -13,4 +13,8 @@ class View
     public $isAdmin;                // TRUE for authorized admin user
     public $content;                // page content (is inserted into template)
     public $userName;               // contains user name (if authorized)
+    public $pollName;
+    public $itemQuestion;
+    public $options = array();
+    public $loggedOff;              // TRUE when user has just logged-off
 }
