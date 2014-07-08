@@ -20,7 +20,7 @@ class Request
      * @return mixed
      */
     public function get($key){
-        return $this->params[$key];
+        return isset($this->params[$key]) ? $this->params[$key] : null;
     }
     /**
      * Set request parameter
@@ -44,7 +44,7 @@ class Request
      * @return bool
      */
     public function isSetParam($key){
-        return !empty($this->params[$key]);
+        return isset($this->params[$key]);
     }
     /**
      * Filters email request parameter

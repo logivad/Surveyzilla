@@ -1,12 +1,15 @@
 <?php
 namespace surveyzilla\application\controller;
-use surveyzilla\application\model\poll\Logic,
-    surveyzilla\application\model\poll\Item,
-    surveyzilla\application\model\poll\Options,
-    surveyzilla\application\view\UI,
-    surveyzilla\application\model\View,
-    surveyzilla\application\service\UserService,
-    surveyzilla\application\service\PollService;
+
+use LogicException;
+use surveyzilla\application\model\poll\Item;
+use surveyzilla\application\model\poll\Logic;
+use surveyzilla\application\model\poll\Options;
+use surveyzilla\application\model\Request;
+use surveyzilla\application\model\View;
+use surveyzilla\application\service\PollService;
+use surveyzilla\application\service\UserService;
+use surveyzilla\application\view\UI;
 
 class PollController
 {
@@ -36,7 +39,7 @@ class PollController
             return $this->view->message;
         }
         if (false === $privileges = $this->userService->findUserPrivilegesById($user->getId())){
-            throw new \LogicException('Cannot add Poll. User privileges not found');
+            throw new LogicException('Cannot add Poll. User privileges not found');
         }
         if (false === $privileges->canCreatePoll()){
             $this->view->message = UI::$text['limit_poll'];
@@ -65,35 +68,35 @@ class PollController
         $this->view->poll = $this->pollService->findPollById($this->request->getParam('id'));
         return $this->view;
     }
-    public function setRequest($request){
+    public function setRequest(Request $request){
         $this->request = $request;
     }
-    public function setView($view){
-        $this->view = $view;
-    }
+    /**
+     * Runs the poll
+     * 
+     * @return obj Returns View object for rendering the page
+     * @throws LogicException
+     */
     public function runPoll(){
-        $r = $this->request;
-        /*  Если пользователь НЕ передал свой талон на прохождение опроса, то он здесь впервые.
-            Генерируем для пользователя талон (будет предъявлять при прохождении опроса).
-            Создаем новый объект Answer и записываем в него сгенерированный талон, сохраняем Answer
-            Также этот талон должен сохраниться у пользователя.
-        */
-        $pollId = $r->getParam('pollId');
+        // At leat pollId must be set
+        $pollId = $this->request->get('poll');
         if (empty($pollId) && $pollId !== 0){
-            throw new \LogicException('Cannot run poll! Poll id not set');
+            $this->request->message = 'Cannot run poll! Poll id not set';
+            return $this->request;
         }
-        if (!$this->pollService->isUniqueUser($pollId, $r->getParam('token'))){
+        if (!$this->pollService->isUniqueUser($pollId, $this->request->get('token'))){
             $this->view->message = UI::$text['poll_answered'];
             return $this->view;
         }
-        if (empty($r->getParam('token'))){
+        // If no token is given, a new quizzee has come and he needs a token
+        if (!$this->request->isSetParam('token')){
             // новый опрашиваемый (еще не имеет талона)
             $token = $this->pollService->addAnswer($pollId);
             setcookie('token', $token, time()+60*60*24*7);
             // Отображаем первый Item опроса, пусть пользователь начинает отвечать
             $poll = $this->pollService->findPollById($pollId);
             if (empty($poll)){
-                throw new \LogicException('Cannot run, poll not found!');
+                throw new LogicException('Cannot run, poll not found!');
             }
             $this->view->item = $poll->getItem(0);
             $this->view->pollId = $pollId;
@@ -101,23 +104,23 @@ class PollController
             require_once 'surveyzilla/application/view/header.php';
             require_once 'surveyzilla/application/view/displayItem.php';
         } else {
-            if (empty($r->getParam('itemId')) && $r->getParam('itemId') !== 0
-                || sizeof($r->getParam('options')) < 1){
-                throw new \LogicException('Cannot process answer, item or option id is not set');
+            if (empty($this->request->get('itemId')) && $this->request->get('itemId') !== 0
+                || sizeof($this->request->get('options')) < 1){
+                throw new LogicException('Cannot process answer, item or option id is not set');
             }
             $ans = $this->pollService->findAnswer($_COOKIE['token']);
             if ($ans->getPollId() != $pollId){
-                throw new \LogicException('This answer file does not belong to the poll');
+                throw new LogicException('This answer file does not belong to the poll');
             }
             // записываем ответ пользователя
-            $ans->addItem($r->getParam('itemId'), $r->getParam('customOption'), $r->getParam('options'));
+            $ans->addItem($this->request->get('itemId'), $this->request->get('customOption'), $this->request->get('options'));
             $this->pollService->updateAnswer($ans);
             // задаем пользователю следующий вопрос (согласно логике)
             $lg = $this->pollService->findLogic($pollId);
-            $nextItem = $lg->getNextItem($r->getParam('itemId'),$r->getParam('options'));
+            $nextItem = $lg->getNextItem($this->request->get('itemId'),$this->request->get('options'));
             if ($nextItem === Logic::END){
                 // Заносим талон в список использованных и считаем результаты
-                $this->pollService->addUsedToken($pollId, $r->getParam('token'));
+                $this->pollService->addUsedToken($pollId, $this->request->get('token'));
                 $this->pollService->appendResults($ans);
                 // Выводим сообщение об окончании опроса
                 $this->view->message = UI::$text['poll_end'];
@@ -128,7 +131,7 @@ class PollController
             } else {
                 $poll = $this->pollService->findPollById($pollId);
                 if ($poll === false){
-                    throw new \LogicException('Poll not found');
+                    throw new LogicException('Poll not found');
                 }
                 $this->view->item = $poll->getItem($nextItem);
                 $this->view->pollId = $pollId;
