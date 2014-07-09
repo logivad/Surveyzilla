@@ -4,9 +4,9 @@ class Options
 {
     const TYPE_RADIO = 'radio';
     const TYPE_CHECKBOX = 'checkbox';
-    private $type;                        // тип выбора (radio, checkbox...)
-    private $hasCustomField = false;    // будет ли индивидуальный вариант
-    private $optionList = array();        // массив с вариантами (массив строк)
+    private $type;                          // тип выбора (radio, checkbox...)
+    private $hasCustomField = false;        // будет ли индивидуальный вариант
+    private $optionList = array();          // массив с вариантами (массив строк)
     public function __construct($type, $hasCustomField, array $optionList){
         $this->setType($type);
         $this->hasCustomField = (bool) $hasCustomField;

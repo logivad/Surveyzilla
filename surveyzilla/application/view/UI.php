@@ -14,6 +14,7 @@ abstract class UI
         'view_poll' => 'Просмотреть опрос',
         'enterCustOp' => 'другое...',
         'poll_end' => 'Спасибо за участие!',
+        'poll_notfound' => 'Опрос не найден',
         'poll_answered' => 'Вы уже отвечали на этот опрос',
         'main_page' => 'Главная'
     );

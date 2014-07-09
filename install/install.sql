@@ -101,20 +101,20 @@ CREATE TABLE `Polls`
 -- List of items for polls (one item = question + options)
 -- When a poll is deleted from Polls table, corresponding records from
 -- this table are also deleted (cascade delition)
-CREATE TABLE PollItems
+CREATE TABLE `PollItems`
 (
-  `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `PollId` INT UNSIGNED NOT NULL,
-  `QuestionText` CHAR(255) NOT NULL,
-  `ImagePath` CHAR(255),
-  `InputType` ENUM('checkbox','radio','text') NOT NULL,
-  `IsFinal` BOOLEAN
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `pollId` INT UNSIGNED NOT NULL,
+  `questionText` CHAR(255) NOT NULL,
+  `imagePath` CHAR(255),
+  `inputType` ENUM('checkbox','radio','text') NOT NULL,
+  `isFinal` BOOLEAN
     COMMENT 'Final item (page) does not have questions, it is used to 
     communicate with a quizzee',
-  `FinalLink` CHAR(255)
+  `finalLink` CHAR(255)
     COMMENT 'On competion of the poll the quizzee will be redirected according 
     to this link',
-  `FinalComment` VARCHAR(1000),
+  `finalComment` VARCHAR(1000),
   FOREIGN KEY (`PollId`) REFERENCES `Polls` (`Id`) ON DELETE CASCADE,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB;
@@ -129,7 +129,7 @@ CREATE TABLE ItemOptions
   `ItemId` INT UNSIGNED NOT NULL,
   `OptionText` CHAR(255) NOT NULL,
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`),
-  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`Id`) ON DELETE CASCADE,
+  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`) ON DELETE CASCADE,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB;
 
@@ -143,7 +143,7 @@ CREATE TABLE Logic
   `NextItemId` INT UNSIGNED NOT NULL
     COMMENT 'Zero when poll is complete',
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`),
-  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`Id`),
+  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`),
   FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`) ON DELETE CASCADE,
   PRIMARY KEY (`PollId`, `ItemId`, `OptionId`)
 ) ENGINE=InnoDB;
@@ -158,7 +158,7 @@ CREATE TABLE AnswersInternal
   `OptionId` INT UNSIGNED NOT NULL,
   `CustomText` VARCHAR(255),
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
-  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`Id`),
+  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`),
   FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`),
   PRIMARY KEY (`UserId`, `PollId`, `ItemId`)
 ) ENGINE=InnoDB;
@@ -171,7 +171,7 @@ CREATE TABLE PollResults
   `OptionId` INT UNSIGNED NOT NULL,
   `VotesCount` INT UNSIGNED DEFAULT 0,
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
-  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`Id`),
+  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`),
   FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`),
   PRIMARY KEY (`PollId`, `ItemId`, `OptionId`)
 ) ENGINE=InnoDB;
@@ -193,6 +193,16 @@ CREATE TABLE FilterPollAllowUserId
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
   FOREIGN KEY (`UserId`) REFERENCES `Users`(`Id`),
   PRIMARY KEY (`PollId`, `UserId`)
+);
+
+-- Table for storing temporary Answer objects
+-- When a user finishes answering a poll, corresponding record 
+-- from this table is deleted
+CREATE TABLE `AnswerTemp`
+(
+  `Token` DECIMAL(14,4) NOT NULL COMMENT 'PHP microtime, float',
+  `AnswerObj` VARCHAR(500) NOT NULL,
+  PRIMARY KEY (`Token`)
 );
 
 

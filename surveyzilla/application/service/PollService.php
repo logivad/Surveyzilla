@@ -1,98 +1,64 @@
 <?php
 namespace surveyzilla\application\service;
-use surveyzilla\application\model\poll\Poll;
+
+use surveyzilla\application\dao\PollDAOMySQL;
+use surveyzilla\application\model\poll\Answer;
+use surveyzilla\application\view\UI;
+
 class PollService
 {
     private static $_instance;
     private $pollDAO;
-    private $answerDAO;
-    private $logicDAO;
-    private $userService;
+    //private $userService;
     private function __construct(){
-        /*пусто*/
+        /*empty*/
     }
     public static function getInstance(){
         if (null === self::$_instance){
             self::$_instance = new self();
+            self::$_instance->pollDAO = PollDAOMySQL::getInstance();
         }
         return self::$_instance;
     }
-    public function setPollDAO($dao){
-        $this->pollDAO = $dao;
+    
+     /**
+     * Creates temporary object Anser that lives while user is answering the poll
+     * @param type $pollId Id of the poll
+     */
+    public function createTempAnswer($pollId){
+        $ans = new Answer($pollId);
+        // For the case two ore more people answer at the same 
+        // fraction of a second, let's do it in a cycle
+        do {
+            // Generating a token as a timestamp with microseconds
+            $token = $ans->generateToken();
+            $ans = serialize($ans);
+            // If such a token already exists (answer will not be inserted and
+            // $res will become 0 or FALSE), let's generate a new one
+            $res = $this->pollDAO->addTempAnswer($token, $ans);
+        } while (empty($res));
+        return $token;
     }
-    public function setAnswerDAO($dao){
-        $this->answerDAO = $dao;
-    }
-    public function setLogicDAO($dao){
-        $this->logicDAO = $dao;
-    }
-    public function setUserService($srv){
-        $this->userService = $srv;
-    }
-    public function findPollById($id){
-        return $this->pollDAO->findPollById($id);
-    }
-    public function addPoll($user, $privileges, $pollName){
-        $poll = new Poll($user->getId(), $pollName);
-        $id = $this->pollDAO->addPoll($poll);
-        if ($id < 0){
-            return $id;
+    public function appendTempAnswer($token, $item, array $options, $custopt) {
+        $ans = $this->pollDAO->getTempAnswer($token);
+        $ans->addItem($item, $custopt, $options);
+        if (!$this->pollDAO->updateTempAnswer($ans)) {
+            throw new Exception(UI::$text['error']);
         }
-        $user->addPoll((integer) $id);
-        $this->userService->updateUser($user);
-        $privileges->decrementPollNum();
-        $this->userService->updateUserPrivileges($privileges);
-        // Возвращаем id созданного опроса
-        return $id;
     }
-    public function addItem($pollId, $item){
-        return $this->pollDAO->addItem($pollId, $item);
+    /**
+     * Returns Item object filled with data for a given item
+     * @param type $pollId Poll Id
+     * @param type $itemId Item Id 
+     * @return obj Item object
+     */
+    public function getFirstItem($pollId) {
+        return $this->pollDAO->getItem($pollId, 1);
     }
-    public function addAnswer($pollId){
-        return $this->answerDAO->addAnswer($pollId);
-    }
-    public function updateAnswer($ans){
-        $this->answerDAO->updateAnswer($ans);
-    }
-    public function findAnswer($token){
-        return $this->answerDAO->findAnswer($token);
-    }
-    public function findLogic($id){
-        return $this->logicDAO->findLogic($id);
+    public function getNextItem($pollId, $itemId, array $options) {
+        return $this->pollDAO->getNextItem($pollId, $itemId, $options);
     }
     public function isUniqueUser($pollId, $token){
-        return false;
-        if ($this->pollDAO->isUsedToken($pollId, $token)){
-            return false;
-        }
         return true;
-    }
-    public function addUsedToken($pollId, $token){
-        $this->pollDAO->addUsedToken($pollId, $token);
-    }
-    public function appendResults($ans) {
-        // Читаем общие результаты по опросу
-        if (false === $res = $this->pollDAO->getResults()){
-            // На опрос еще не отвечали, создаем массив результатов
-            $poll = $this->pollDAO->findPollById($ans->getPollId());
-            if ($poll === false){
-                throw new \RuntimeException('Poll does not exist!');
-            }
-            $res = array();
-            $items = $poll->getItemsArr();
-            foreach($items as $item){
-                $temp = array('q' => $item->getQuestion());
-                foreach ($item->getOptions()->getOptionList() as $val){
-                    $temp[] = array($val,'');
-                }
-                $res[] = $temp;
-            }
-        }
-        /*
-         * ДОДЕЛАТЬ
-         */
-        require_once 'surveyzilla/application/view/header.php';
-        var_dump($ans);
-        var_dump($res);
     }
 }

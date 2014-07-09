@@ -1,34 +1,21 @@
 <?php
 namespace surveyzilla\application\model\poll;
+
 class Answer
 {
-    private $pollId;            // опрос, для которого предназначен данный ответ
-    private $token;                // талон на прохождение опроса
-    private $items=array();        // $items[itemId] = [customOption, option 1, option 2, ... option N]
+    // Id of the poll that is being answered
+    public $pollId;
+    // A token (current time) for answering the poll
+    public $token;
+    public $items=array();
 
     public function __construct($pollId){
         $this->pollId = $pollId;
     }
-    public function getPollId(){
-        return $this->pollId;
-    }
-    public function getToken(){
-        return $this->token;
-    }
-    public function setToken($token){
-        $this->token = $token;
-    }
     public function generateToken(){
-        $this->token = md5(microtime().rand(100,999));
+        return $this->token = microtime(true);
     }
-    public function setItems(array $items){
-        $this->items = $items;
-    }
-    public function getItems(){
-        return $this->items;
-    }
-    public function addItem($itemId, $custom, array $items){
-        array_unshift($items, $custom);
-        $this->items[$itemId] = $items;
+    public function addItem($itemId, $custom, array $options){
+        $this->items[$itemId] = array('custopt' => $custom, 'opts' => $options);
     }
 }

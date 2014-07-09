@@ -7,6 +7,5 @@ interface IPollDAO
 {
     public function addPoll(Poll $poll);
     public function deletePoll($id);
-    public function findPollById($id);
     public function addItem($pollId, Item $item);
 }

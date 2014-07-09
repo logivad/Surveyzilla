@@ -4,7 +4,7 @@ class Poll
 {
     private $id;                // идентификатор опроса
     private $name;                // название опроса
-    private $creatorId;            // Id пользователя, создавшего данный опрос
+    private $userId;            // Id пользователя, создавшего данный опрос
     private $items = array();    // массив с элементами опроса (объекты класса Item)
 
     public function __construct($creatorId, $name){

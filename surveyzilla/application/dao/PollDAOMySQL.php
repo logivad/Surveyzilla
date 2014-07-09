@@ -1,20 +1,16 @@
 <?php
 namespace surveyzilla\application\dao;
-use surveyzilla\application\model\poll\Poll,
-    surveyzilla\application\model\poll\Item,
-    surveyzilla\application\model\poll\Options;
-class PollDAOFileCSV implements IPollDAO
+
+use surveyzilla\application\model\poll\Item;
+use surveyzilla\application\model\poll\Poll;
+use surveyzilla\application\dao\DbConnection;
+use surveyzilla\application\model\poll\Answer;
+
+class PollDAOMySQL implements IPollDAO
 {
-    /*    Для каждого опроса создается отдельный файл. В первой строке файл
-        хранится $creatorId (id пользователя, создавшего опрос) и $name (имя опроса).
-        В последующих строках сохраняются объекты Item.
-        Сначала нужно создать файл опроса и записать туда первую строку (метод addPoll),
-        потом один за другим добавлять вопросы с вариантами ответов (метод addItem)
-    */
-    private $path;                        // Путь к CSV файлу с данными пользователей
-    private static $_instance;            // Единственный объект класса
+    private static $_instance;
     private function __construct(){
-        /*пусто*/
+        /*empty*/
     }
     public static function getInstance(){
         if (null === self::$_instance){
@@ -22,105 +18,93 @@ class PollDAOFileCSV implements IPollDAO
         }
         return self::$_instance;
     }
-    public function setPath($path){
-        $this->path = $path;
+
+    public function addItem($pollId, Item $item) {
+        
     }
-    public function addPoll(Poll $poll){
-        if (!isset($this->path)){
-            throw new \LogicException('Cannot save Poll, path to CSV file is not set');
-        }
-        // Проверяем счетчик опросов и берём id для нового опроса
-        if (file_exists($this->path.'poll/poll_id.csv')){
-            $id = 0 + file_get_contents($this->path.'poll/poll_id.csv');
-            file_put_contents($this->path.'poll/poll_id.csv', $id+1);
-        } else {
-            $id = 0;
-            file_put_contents($this->path.'poll/poll_id.csv', '1');
-        }
-        // Сохраняем новый опрос в файл (отдельный файл для каждого опроса)
-        // Если файл для этого опоса уже создан - ошибка
-        if (file_exists($this->path.'poll/poll_'.$id.'.csv')){
-            //throw new \Exception('Cannot add poll because '.$this->path.'poll_'.$id.'.csv already exists');
-            return -1;
-        }
-        // Создаём файл для опроса и записываем первую строку - id создателя и название опроса
-        if (false === $handle = fopen($this->path.'poll/poll_'.$id.'.csv','w')){
-            //throw new \RuntimeException('Error creating '.$this->path.'poll_'.$id.'.csv','w');
-            return -2;
-        }
-        if (false === fwrite($handle,'"'.$poll->getCreatorId().'","'.$poll->getName().'"'.PHP_EOL)){
-            //throw new \RuntimeException('Error writing to file '.$this->path.'poll_'.$id.'.csv');
-            return -3;
-        }
-        return fclose($handle) ? $id : -4;
+
+    public function addPoll(Poll $poll) {
+        
     }
-    public function addItem($pollId, Item $item){
-        // Каждый Item представлен в файле своего опроса в виде одной строки (начиная со второй):
-        // $itemId $question   $type $hasCustomField option_0 option_1 option_2... ($optionList elements)
-        // |__ Item _______|   |___________ Options _____...
-        if (!isset($this->path)){
-            throw new \LogicException('Cannot save Item, path to CSV file is not set');
-        }
-        if (!file_exists($this->path.'poll/poll_'.$pollId.'.csv')){
-            throw new \Exception('Cannot add item because '.$this->path.'poll/poll_'.$pollId.'.csv does not exist');
-        }
-        if (false === $file = file($this->path.'poll/poll_'.$pollId.'.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)){
-            throw new \RuntimeException('Error creating '.$this->path.'poll/poll_'.$pollId.'.csv');
-        }
-        $file[] = '"'.(sizeof($file)-1).'",'.$item->toCSV();
-        $handle = fopen($this->path.'poll/poll_'.$pollId.'.csv','w');
-        if (false === $handle){
-            throw new \RuntimeException('Error creating '.$this->path.'poll/poll_'.$pollId.'.csv','w');
-        }
-        foreach ($file as $val){
-            fwrite($handle, $val.PHP_EOL);
-        }
-        fclose($handle);
-        return true;
+
+    public function deletePoll($id) {
+        
     }
-    public function deletePoll($id){
+    public function addTempAnswer($token, $ans) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->prepare('INSERT INTO `AnswerTemp`(`Token`, `AnswerObj`) '
+                            . 'VALUES (?,?)');
+        return $stmt->execute(array($token, $ans));
     }
-    public function findPollById($pollId){
-        if (!isset($this->path)){
-            throw new \LogicException('Cannot find Poll, path to CSV file is not set');
+    public function getTempAnswer($token) {
+        $token = (float) $token;
+        $dbh = DbConnection::getInstance()->getHandler();
+        $sql = "SELECT `AnswerObj` FROM `AnswerTemp` "
+             . "WHERE `Token` = '$token'";
+        $stmt = $dbh->query($sql);
+        $ans = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (empty($ans)) {
+            throw new Exception('Cannot find TempAnswer');
         }
-        if (!file_exists($this->path.'poll/poll_'.$pollId.'.csv')){
-            return false;
-        }
-        if (false === $file = file($this->path.'poll/poll_'.$pollId.'.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)){
-            throw new \RuntimeException('Error extracting poll from '.$this->path.'poll/poll_'.$pollId.'.csv');
-        }
-        $tempArr = str_getcsv($file[0]);
-        $poll = new Poll($tempArr[0], $tempArr[1]);
-        $poll->setId($pollId);
-        for ($i=1, $size=sizeof($file); $i<$size; $i++){
-            $tempArr = str_getcsv($file[$i]);
-            $item = new Item($tempArr[1]);
-            $item->setId($tempArr[0]);
-            //создаем объект Options
-            $optionList = array_slice($tempArr,4);
-            $options = new Options($tempArr[2], $tempArr[3], $optionList);
-            $item->setOptions($options);
-            $poll->addItem($item);
-        }
-        return $poll;
+        return unserialize($ans['AnswerObj']);
     }
-    public function isUsedToken($pollId, $token){
-        // если файла еще нет, значит никто еще не отвечал на этот вопрос
-        if (!file_exists($this->path.'used_tokens/'.$pollId.'.txt')){
-            return false;
-        }
-        if (false === $file = file($this->path.'used_tokens/'.$pollId.'.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)){
-            throw new \RuntimeException('Error reading file with used tokens');
-        }
-        return (false !== array_search($token, $file)) ? true : false;
+    public function updateTempAnswer(Answer $ans) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->prepare('UPDATE AnswerTemp SET AnswerObj = ? '
+                            . 'WHERE Token = ?');
+        return $stmt->execute(array(serialize($ans), $ans->token));
     }
-    public function addUsedToken($pollId, $token){
-        if (false === file_put_contents($this->path.'used_tokens/'.$pollId.'.txt', $token.PHP_EOL, FILE_APPEND)){
-            throw new \RuntimeException('Error adding used token');
+    /**
+     * Returns Item object filled with data for a given item
+     * @param type $pollId Poll Id
+     * @param type $itemId Item Id 
+     * @return obj Item object
+     */
+    public function getItem($pollId, $itemId) {
+        // Getting Item from DB (without options)
+        $sql = "SELECT pi.id, pi.pollId, pi.questionText, pi.imagePath,"
+             . "pi.inputType, pi.isFinal, pi.finalLink, pi.finalComment, "
+             . "p.Name AS pollName "
+             . "FROM PollItems AS pi INNER JOIN Polls AS p "
+             . "ON pi.id = '$itemId' "
+             . "AND pi.pollId = '$pollId' "
+             . "AND pi.pollId = p.Id";
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->query($sql);
+        $item = $stmt->fetchObject('surveyzilla\application\model\poll\Item');
+        if (empty($item)) {
+            return;
         }
+        // Getting options for the Item
+        $options = array();
+        $sql = "SELECT `Id`, `OptionText` FROM `ItemOptions` "
+             . "WHERE `PollId` = '$pollId' AND `ItemId` = '$itemId'";
+        foreach ($dbh->query($sql) as $option) {
+            $options[$option['Id']] = $option['OptionText'];
+        }
+        $item->options = $options;
+        return $item;
     }
-    public function getResults() {
-        return false;
+    public function getNextItem($pollId, $itemId, array $options) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->prepare(
+            'SELECT NextItemId FROM Logic '
+          . 'WHERE PollId = :poll AND ItemId = :item AND OptionId = :opt'
+        );
+        $stmt->bindParam(':poll', $pollId, \PDO::PARAM_INT);
+        $stmt->bindParam(':item', $itemId, \PDO::PARAM_INT);
+        $stmt->bindParam(':opt', $options[0], \PDO::PARAM_INT);
+        if (false == $stmt->execute()) {
+            return;
+        }
+        $next = $stmt->fetch(\PDO::FETCH_NUM);
+        // This was the las question, nowhere to go now.
+        // Creating a specisl 'system' item to finish questioning a user
+        if ($next[0] == 0) {
+            $item = new Item();
+            $item->isSystemFinal = true;
+            return $item;
+        }
+        return $this->getItem($pollId, $next[0]);
     }
 }

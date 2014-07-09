@@ -166,7 +166,7 @@ class FrontController
      *      poll        - poll Id in database
      *      item        - item Id of the poll
      *      custopt     - user's custom option
-     *      opts        - selected options
+     *      opts        - selected options (array)
      */
     private function actionRun() {
         $this->request->filterPollRunParams();
