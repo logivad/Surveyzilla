@@ -30,21 +30,21 @@ class PollDAOMySQL implements IPollDAO
     public function deletePoll($id) {
         
     }
-    public function addTempAnswer($token, $ans) {
+    public function addTempAnswer(Answer $ans) {
         $dbh = DbConnection::getInstance()->getHandler();
-        $stmt = $dbh->prepare('INSERT INTO `AnswerTemp`(`Token`, `AnswerObj`) '
-                            . 'VALUES (?,?)');
-        return $stmt->execute(array($token, $ans));
+        $stmt = $dbh->prepare(
+            'INSERT INTO `AnswerTemp`(`Token`, `AnswerObj`) VALUES (?,?)'
+        );
+        return $stmt->execute(array($ans->token, serialize($ans)));
     }
     public function getTempAnswer($token) {
-        $token = (float) $token;
         $dbh = DbConnection::getInstance()->getHandler();
         $sql = "SELECT `AnswerObj` FROM `AnswerTemp` "
              . "WHERE `Token` = '$token'";
         $stmt = $dbh->query($sql);
         $ans = $stmt->fetch(\PDO::FETCH_ASSOC);
         if (empty($ans)) {
-            throw new Exception('Cannot find TempAnswer');
+            return;
         }
         return unserialize($ans['AnswerObj']);
     }
@@ -85,26 +85,37 @@ class PollDAOMySQL implements IPollDAO
         $item->options = $options;
         return $item;
     }
-    public function getNextItem($pollId, $itemId, array $options) {
+    /**
+     * 
+     * @param numeric $token
+     * @return obj Item 
+     */
+    public function getNextItem($token) {
+        // Let's decide what should be next item according to the answers
+        $ans = $this->getTempAnswer($token);
+        if (empty($ans->items)) {
+            // If no answer yet, just display the first one
+            return $this->getItem($ans->pollId, 1);
+        }
+        // Using Logic to find next Item
         $dbh = DbConnection::getInstance()->getHandler();
         $stmt = $dbh->prepare(
             'SELECT NextItemId FROM Logic '
-          . 'WHERE PollId = :poll AND ItemId = :item AND OptionId = :opt'
+          . "WHERE PollId = {$ans->pollId} "
+          . "AND ItemId = {$ans->currentItem} "
+          . "AND Options = {$ans->getCurrentOpts()}"
         );
-        $stmt->bindParam(':poll', $pollId, \PDO::PARAM_INT);
-        $stmt->bindParam(':item', $itemId, \PDO::PARAM_INT);
-        $stmt->bindParam(':opt', $options[0], \PDO::PARAM_INT);
         if (false == $stmt->execute()) {
             return;
         }
         $next = $stmt->fetch(\PDO::FETCH_NUM);
-        // This was the las question, nowhere to go now.
-        // Creating a specisl 'system' item to finish questioning a user
         if ($next[0] == 0) {
+            // This was the las question, nowhere to go now.
+            // Creating a specisl 'system' item to finish questioning a user
             $item = new Item();
             $item->isSystemFinal = true;
             return $item;
         }
-        return $this->getItem($pollId, $next[0]);
+        return $this->getItem($ans->pollId, $next[0]);
     }
 }

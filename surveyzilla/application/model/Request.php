@@ -6,7 +6,7 @@ namespace surveyzilla\application\model;
 class Request
 {
     // Request parameters. Are usually taken from $_REQUEST
-    private $params = array();
+    public $params = array();
     /**
      * Stores request parameters, which are usually taken from $_REQUEST
      * @param array $params An array (can be $_REQUEST)
@@ -80,9 +80,6 @@ class Request
     public function filterPollRunParams() {
         if (isset($this->params['poll'])) {
             $this->params['poll'] = \filter_var($this->params['poll'], FILTER_VALIDATE_INT);
-        }
-        if (isset($this->params['item'])) {
-            $this->params['item'] = \filter_var($this->params['item'], FILTER_VALIDATE_INT);
         }
         if (isset($this->params['custopt'])) {
             $this->params['custopt'] = \filter_var($this->params['custopt'], FILTER_SANITIZE_SPECIAL_CHARS);

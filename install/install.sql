@@ -139,13 +139,13 @@ CREATE TABLE Logic
 (
   `PollId` INT UNSIGNED NOT NULL,
   `ItemId` INT UNSIGNED NOT NULL,
-  `OptionId` INT UNSIGNED NOT NULL,
+  `Options` INT UNSIGNED NOT NULL
+    COMMENT 'Bit mask of selected options',
   `NextItemId` INT UNSIGNED NOT NULL
     COMMENT 'Zero when poll is complete',
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`),
-  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`),
-  FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`) ON DELETE CASCADE,
-  PRIMARY KEY (`PollId`, `ItemId`, `OptionId`)
+  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`) ON DELETE CASCADE,
+  PRIMARY KEY (`PollId`, `ItemId`, `Options`)
 ) ENGINE=InnoDB;
 
 -- If poll creator wishes, every answer of a registered quizzee is
@@ -266,26 +266,43 @@ CALL createUser(1, 'internal', 'admin@surveyzilla.ru', 'Admin', MD5(CONCAT('x9gZ
 
 -- Creating a sample poll
 INSERT INTO `Polls` (`Id`, `UserId`, `Name`, `CreationDate`, `FiltersMask`)
-VALUES (NULL, '1', 'Apples', NULL, '0');
+VALUES (NULL, '1', 'Супер опрос', NULL, '0');
 
-INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalLink`, `FinalComment`)
-VALUES (1, '1', 'Do you like apples?', NULL, 'radio', NULL, NULL, NULL);
-
-INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (NULL, '1', '1', 'I do like them!'), (NULL, '1', '1', 'Not really'), (NULL, '1', '1', 'Only if they come from California ;)');
-
-INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalLink`, `FinalComment`)
-VALUES (2, '1', 'Какие яблоки вы любите больше?', NULL, 'radio', NULL, NULL, NULL);
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (1, '1', 'Будьте добры, укажите свой пол', NULL, 'radio', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (NULL, '1', '2', 'Большие'), (NULL, '1', '2', 'Маленькие');
+VALUES (1, '1', '1', 'Мужчина'), (2, '1', '1', 'Женщина');
 
-INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalLink`, `FinalComment`)
-VALUES (3, '1', 'Какие груши вы любите больше?', NULL, 'radio', NULL, NULL, NULL);
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (2, '1', 'Какого цвета эта сумочка?', '/home/vadim/www/surveyzilla.dev/upload/1.jpg', 'radio', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (NULL, '1', '3', 'Твёрдые'), (NULL, '1', '3', 'Мягкие');
+VALUES (3, '1', '2', 'Красного'), (4, '1', '2', 'Синего');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (3, '1', 'Какого цвета этот автомобиль?', '/home/vadim/www/surveyzilla.dev/upload/2.jpg', 'radio', NULL, NULL);
+
+INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
+VALUES (5, '1', '3', 'Красного'), (6, '1', '3', 'Синего');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (4, '1', 'Вы различаете цвета, это здорово! Идем дальше?', NULL, 'radio', NULL, NULL);
+
+INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
+VALUES (7, '1', '4', 'Да'), (8, '1', '4', 'Не надо');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (5, '1', '', NULL, 'radio', 1, 'Вы не различаете цвета. Очень жаль, но для Вас опрос окончен :-(');
 
 -- Creating logic for the sample poll
-INSERT INTO `surveyzilla`.`Logic` (`PollId`, `ItemId`, `OptionId`, `NextItemId`)
-VALUES ('1', '1', '1', '2'), ('1', '1', '2', '3'), ('1', '2', '3', '0'), ('1', '2', '4', '0'), ('1', '3', '5', '0'), ('1', '3', '6', '0');
+INSERT INTO `surveyzilla`.`Logic` (`PollId`, `ItemId`, `Options`, `NextItemId`)
+VALUES 
+('1', '1', '1', '3'),
+('1', '1', '2', '2'),
+('1', '2', '3', '4'),
+('1', '2', '4', '5'),
+('1', '3', '5', '4'),
+('1', '3', '6', '5'),
+('1', '4', '7', '6'),
+('1', '4', '8', '0');

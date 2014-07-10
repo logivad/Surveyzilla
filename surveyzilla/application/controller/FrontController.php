@@ -157,14 +157,13 @@ class FrontController
      * Runs the poll.
      * 
      * Firstly, user receives a token. This token is sent to the server with every
-     * answer. Answers are stored in a temporary file on the server untill poll
-     * is finished. When poll is finished (answered), this file is deleted and
-     * answers are sent to the database.
+     * answer. Answers are stored in a dedicated table AnswerTemp untill poll
+     * is finished. When poll is finished (answered), records are deleted and
+     * answers are added to poll results.
      * 
      * Parameters for this action:
      * 
      *      poll        - poll Id in database
-     *      item        - item Id of the poll
      *      custopt     - user's custom option
      *      opts        - selected options (array)
      */

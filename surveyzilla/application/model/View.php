@@ -17,4 +17,15 @@ class View
     public $itemQuestion;
     public $options = array();
     public $loggedOff;              // TRUE when user has just logged-off
+    
+    /**
+     * Sets the message and returns the object itself. Just a useful function
+     * to write less code
+     * @param string $msg Message to be set
+     * @return obg View object
+     */
+    public function setMessage($msg) {
+        $this->message = $msg;
+        return $this;
+    }
 }
