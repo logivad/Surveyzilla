@@ -44,7 +44,6 @@ class PollService
     }
     public function appendTempAnswer($token, array $options, $custopt) {
         $ans = $this->pollDAO->getTempAnswer($token);
-        //echo 'old:';var_dump($ans);
         $ans->addItem($ans->currentItem, $custopt, $options);
         if (!$this->pollDAO->updateTempAnswer($ans)) {
             throw new Exception(UI::$text['error']);
@@ -98,11 +97,12 @@ class PollService
      * @param type $token
      */
     public function processTempAnswer($token) {
-        $ans = $this->pollDAO->getTempAnswer($token);
-        unset($ans->pollId, $ans->currentItem, $ans->items);
-        $ans->completed = true;
-        $this->pollDAO->updateTempAnswer($ans);
-        setcookie('token', NULL, time() - 1000);
+        $this->pollDAO->deleteTempAnswer($token);
+//        $ans = $this->pollDAO->getTempAnswer($token);
+//        unset($ans->pollId, $ans->currentItem, $ans->items);
+//        $ans->completed = true;
+//        $this->pollDAO->updateTempAnswer($ans);
+        setcookie('token', NULL, time() - 10000);
     }
     public function makeLogicArray(array $queryResult) {
         /*

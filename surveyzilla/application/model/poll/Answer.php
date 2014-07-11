@@ -32,7 +32,7 @@ class Answer
         foreach ($options as $val) {
             $bitMask += pow(2, $val-1);
         }
-        $this->items[$itemId] = array('custopt' => $custom, 'opts' => $bitMask);
+        $this->items[$itemId] = array('custopt' => $custom, 'opts' => (int) $bitMask);
     }
     public function getCurrentOpts() {
         return $this->items[$this->currentItem]['opts'];

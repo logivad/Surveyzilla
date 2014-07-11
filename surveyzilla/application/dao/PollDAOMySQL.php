@@ -57,6 +57,10 @@ class PollDAOMySQL implements IPollDAO
                             . 'WHERE Token = ?');
         return $stmt->execute(array(serialize($ans), $ans->token));
     }
+    public function deleteTempAnswer($token) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $dbh->exec("DELETE FROM AnswerTemp WHERE Token = $token");
+    }
     /**
      * Returns Item object filled with data for a given item
      * @param type $pollId Poll Id
