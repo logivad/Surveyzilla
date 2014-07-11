@@ -299,7 +299,7 @@ INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType
 VALUES (6, '1', 'Чем из этого Вы умеете пользоваться?', NULL, 'checkbox', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (NULL, '1', '6', 'HTML'), (NULL, '1', '6', 'CSS'), (NULL, '1', '6', 'PHP');
+VALUES (NULL, '1', '6', 'HTML'), (NULL, '1', '6', 'CSS'), (NULL, '1', '6', 'PHP'), (NULL, '1', '6', 'Не знаю ничего из перечисленного');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
 VALUES (7, '1', NULL, NULL, 'radio', 1, 'Будет здорово, когда Вы выучите еще что-нибудь кроме HTML ;-)');
@@ -314,7 +314,10 @@ INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType
 VALUES (10, '1', NULL, NULL, 'radio', 1, 'Вы знаете все это? Здорово!');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (11, '1', NULL, NULL, 'radio', 1, 'А выбрали бы все, вас бы похвалили!');
+VALUES (11, '1', NULL, NULL, 'radio', 1, 'А умели бы всё, вас бы похвалили!');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (12, '1', NULL, NULL, 'radio', 1, 'Лузер!');
 
 -- Creating logic for the sample poll
 INSERT INTO `surveyzilla`.`Logic` (`PollId`, `ItemId`, `Options`, `NextItemId`)
@@ -331,4 +334,5 @@ VALUES
 ('1', '6', '2', '8'),
 ('1', '6', '4', '9'),
 ('1', '6', '7', '10'),
+('1', '6', '8', '12'),
 ('1', '6', '0', '11');

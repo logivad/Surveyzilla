@@ -7,7 +7,7 @@
 }
 #box_centered {
     display: block;
-    width: 95%;
+    max-width: 600px;
     border-radius: 5px;
     border: 1px solid #888888;
     padding: 10px;
