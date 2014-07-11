@@ -6,10 +6,8 @@
                 if (isset($view->item->imagePath)) {
                     echo "<p style='text-align: center;'><img class='run' src='{$view->item->imagePath}' /></p>\n";
                 }
-                if ('radio' === $view->item->inputType) {
-                    foreach ($view->item->options as $key => $val) {
-                        echo "<label><input type='radio' name='opts[]' value='$key'>$val</label><br />\n";
-                    }
+                foreach ($view->item->options as $key => $val) {
+                    echo "<label><input type='{$view->item->inputType}' name='opts[]' value='$key'>$val</label><br />\n";
                 }
                 ?>
                 <input type="hidden" name="a" value="run" />

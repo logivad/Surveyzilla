@@ -296,7 +296,7 @@ INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType
 VALUES (5, '1', NULL, NULL, 'radio', 1, 'Вы не различаете цвета. Очень жаль, но для Вас опрос окончен :-(');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (6, '1', 'Чем из этого Вы умеет пользоваться?', NULL, 'checkbox', NULL, NULL);
+VALUES (6, '1', 'Чем из этого Вы умеете пользоваться?', NULL, 'checkbox', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
 VALUES (NULL, '1', '6', 'HTML'), (NULL, '1', '6', 'CSS'), (NULL, '1', '6', 'PHP');
@@ -313,7 +313,8 @@ VALUES (9, '1', NULL, NULL, 'radio', 1, 'PHP это круто!');
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
 VALUES (10, '1', NULL, NULL, 'radio', 1, 'Вы знаете все это? Здорово!');
 
-
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (11, '1', NULL, NULL, 'radio', 1, 'А выбрали бы все, вас бы похвалили!');
 
 -- Creating logic for the sample poll
 INSERT INTO `surveyzilla`.`Logic` (`PollId`, `ItemId`, `Options`, `NextItemId`)
@@ -330,4 +331,4 @@ VALUES
 ('1', '6', '2', '8'),
 ('1', '6', '4', '9'),
 ('1', '6', '7', '10'),
-('1', '6', '0', '0');
+('1', '6', '0', '11');

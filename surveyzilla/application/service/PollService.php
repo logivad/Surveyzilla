@@ -104,4 +104,22 @@ class PollService
         $this->pollDAO->updateTempAnswer($ans);
         setcookie('token', NULL, time() - 1000);
     }
+    public function makeLogicArray(array $queryResult) {
+        /*
+         * $router[0] = current Item
+         * $router[1] = options
+         * $router[2] = next Item
+         */
+        $logic = array();
+        foreach ($queryResult as $router) {
+            if (!isset($logic[$router[0]])) {
+                $logic[$router[0]] = array();
+            }
+            $logic[$router[0]][$router[1]] = $router[2];
+        }
+        /*
+         * $logic[current Item] = array(options => next Item)
+         */
+        return $logic;
+    }
 }

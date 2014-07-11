@@ -1,10 +1,13 @@
 <?php
 namespace surveyzilla\application\dao;
 
-use surveyzilla\application\model\poll\Item;
-use surveyzilla\application\model\poll\Poll;
+use Exception;
+use PDO;
 use surveyzilla\application\dao\DbConnection;
 use surveyzilla\application\model\poll\Answer;
+use surveyzilla\application\model\poll\Item;
+use surveyzilla\application\model\poll\Poll;
+use surveyzilla\application\service\PollService;
 
 class PollDAOMySQL implements IPollDAO
 {
@@ -42,7 +45,7 @@ class PollDAOMySQL implements IPollDAO
         $sql = "SELECT `AnswerObj` FROM `AnswerTemp` "
              . "WHERE `Token` = '$token'";
         $stmt = $dbh->query($sql);
-        $ans = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $ans = $stmt->fetch(PDO::FETCH_ASSOC);
         if (empty($ans)) {
             return;
         }
@@ -81,7 +84,7 @@ class PollDAOMySQL implements IPollDAO
              . "WHERE `PollId` = '$pollId' AND `ItemId` = '$itemId' "
              . "ORDER BY `PollId`";
         $stmt = $dbh->query($sql);
-        $resultArr = $stmt->fetchAll(\PDO::FETCH_NUM);
+        $resultArr = $stmt->fetchAll(PDO::FETCH_NUM);
         foreach ($resultArr as $key => $option) {
             $options[$key + 1] = $option[0];
         }
@@ -103,30 +106,36 @@ class PollDAOMySQL implements IPollDAO
     public function getNextItem($token) {
         // Let's decide what should be next item according to the answers
         $ans = $this->getTempAnswer($token);
-        //var_dump($ans);
-        //var_dump($ans->pollId);
-        //var_dump($ans->currentItem);
-        //var_dump($ans->getCurrentOpts());
-        // Using Logic to find next Item
+        // Take the part of the Logic table for current pollId and itemId
         $dbh = DbConnection::getInstance()->getHandler();
         $stmt = $dbh->prepare(
-            'SELECT NextItemId FROM Logic '
+            'SELECT ItemId, Options, NextItemId FROM Logic '
           . "WHERE PollId = {$ans->pollId} "
-          . "AND ItemId = {$ans->currentItem} "
-          . "AND Options = {$ans->getCurrentOpts()}"
+          . "AND ItemId = {$ans->currentItem}"
         );
         if (false == $stmt->execute()) {
             return;
         }
-        $next = $stmt->fetch(\PDO::FETCH_NUM);
-        //echo 'Logicaly next Item id:'; var_dump($next);
-        if ($next[0] == 0) {
+        $res = $stmt->fetchAll(PDO::FETCH_NUM);
+        // Make a convenient array from the result
+        $logic = PollService::getInstance()->makeLogicArray($res);
+        if (isset($logic[$ans->currentItem][$ans->getCurrentOpts()])) {
+            $nextItemId = $logic[$ans->currentItem][$ans->getCurrentOpts()];
+        } elseif (isset($logic[$ans->currentItem][0])) {
+            // The last chance - default next Item
+            $nextItemId = $logic[$ans->currentItem][0];
+        }
+        if (!isset($nextItemId)) {
+            throw new Exception('Next Item id is not defined');
+        }
+        
+        if ($nextItemId == 0) {
             // This was the las question, nowhere to go now.
             // Creating a specisl 'system' item to finish questioning a user
             $item = new Item();
             $item->isSystemFinal = true;
             return $item;
         }
-        return $this->getItem($ans->pollId, $next[0]);
+        return $this->getItem($ans->pollId, $nextItemId);
     }
 }
