@@ -9,6 +9,8 @@ class Answer
     public $currentItem;
     // A token (current time) for answering the poll
     public $token;
+    // Is TRUE when thist answer has been used up
+    public $completed;
     public $items=array();
 
     public function __construct($pollId){

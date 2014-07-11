@@ -44,10 +44,12 @@ class PollService
     }
     public function appendTempAnswer($token, array $options, $custopt) {
         $ans = $this->pollDAO->getTempAnswer($token);
+        //echo 'old:';var_dump($ans);
         $ans->addItem($ans->currentItem, $custopt, $options);
         if (!$this->pollDAO->updateTempAnswer($ans)) {
             throw new Exception(UI::$text['error']);
         }
+        //echo 'new:';var_dump($ans);
     }
     /**
      * Updates TempAnswer record
@@ -65,6 +67,7 @@ class PollService
         if (!$this->pollDAO->updateTempAnswer($ans)) {
             throw new Exception(UI::$text['error']);
         }
+        return $ans;
     }
     /**
      * Returns Item object filled with data for a given item
@@ -78,14 +81,27 @@ class PollService
     public function getNextItem($token) {
         return $this->pollDAO->getNextItem($token);
     }
+    public function getCurrentItem($token) {
+        return $this->pollDAO->getCurrentItem($token);
+    }
     public function isUniqueUser($pollId, $token){
-        return true;
+        if (empty($token)) {
+            return true;
+        }
+        $ans = $this->pollDAO->getTempAnswer($token);
+        if ($ans->completed) {
+            return false;
+        }
     }
     /**
      * Ads TempAnswer data to the poll statistics
      * @param type $token
      */
     public function processTempAnswer($token) {
-        
+        $ans = $this->pollDAO->getTempAnswer($token);
+        unset($ans->pollId, $ans->currentItem, $ans->items);
+        $ans->completed = true;
+        $this->pollDAO->updateTempAnswer($ans);
+        setcookie('token', NULL, time() - 1000);
     }
 }

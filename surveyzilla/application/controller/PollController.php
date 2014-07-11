@@ -44,12 +44,12 @@ class PollController
         if (empty($pollId)){
             return $this->view->setMessage(UI::$text['poll_notfound']);
         }
-        // Quizze can answer the poll just once
-        if (!$this->pollService->isUniqueUser($pollId, $this->request->get('token'))){
-            return $this->view->setMessage(UI::$text['poll_answered']);
-        }
         // Token is a timestamp and looks like this: 1404984161.9609
         $token = filter_input(INPUT_COOKIE, 'token', FILTER_VALIDATE_FLOAT);
+        // Quizze can answer the poll just once
+        if (false === $this->pollService->isUniqueUser($pollId, $token)){
+            return $this->view->setMessage(UI::$text['poll_answered']);
+        }
         // If no token is given, a new quizzee has come and he needs a token
         if (empty($token)){
             // Get the first poll item if it exists
@@ -67,7 +67,7 @@ class PollController
             if (!$this->request->isSetParam('opts') && !$this->request->isSetParam('custopt') ) {
                 // If no answer provided, show the user an Item to be answered.
                 // So a user can continue poll after closing the browser
-                $item = $this->pollService->getNextItem($token);
+                $item = $this->pollService->getCurrentItem($token);
                 if (empty($item)) {
                     return $this->view->setMessage(UI::$text['error']);
                 }
@@ -83,6 +83,7 @@ class PollController
             );
             // Gettting next answer according to the poll logic
             $item = $this->pollService->getNextItem($token);
+            //echo 'next Item:';var_dump($item);
             if (empty($item)) {
                 return $this->view->setMessage(UI::$text['error']);
             }
@@ -90,16 +91,19 @@ class PollController
             // (Logic nextItem == 0), DAO returns a special 'system' Item with
             // isSystemFinal set to TRUE
             if ($item->isSystemFinal) {
+                $this->pollService->processTempAnswer($token);
                 return $this->view->setMessage(UI::$text['poll_end']);
             }
             if ($item->isFinal) {
                 // The last item appeared, which means the poll is finished.
                 // TempAnswer must be added to poll statistics and then deleted
                 $this->pollService->processTempAnswer($token);
+                $this->view->item = $item;
+                return $this->view;
             }
             // Now we need to set $ans->currentItem to be equal to the id of the 
             // Item being displayed, so that the answer counts for this Item
-            //$this->pollService->updateTempAnswer($token, 'currentItem', $item->id);
+            $this->pollService->updateTempAnswer($token, 'currentItem', $item->id);
             $this->view->item = $item;
             return $this->view;
         }

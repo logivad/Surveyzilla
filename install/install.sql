@@ -105,7 +105,7 @@ CREATE TABLE `PollItems`
 (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `pollId` INT UNSIGNED NOT NULL,
-  `questionText` CHAR(255) NOT NULL,
+  `questionText` CHAR(255) DEFAULT '',
   `imagePath` CHAR(255),
   `inputType` ENUM('checkbox','radio','text') NOT NULL,
   `isFinal` BOOLEAN
@@ -140,7 +140,7 @@ CREATE TABLE Logic
   `PollId` INT UNSIGNED NOT NULL,
   `ItemId` INT UNSIGNED NOT NULL,
   `Options` INT UNSIGNED NOT NULL
-    COMMENT 'Bit mask of selected options',
+    COMMENT 'Bit mask of selected options. Zero for default',
   `NextItemId` INT UNSIGNED NOT NULL
     COMMENT 'Zero when poll is complete',
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`),
@@ -272,37 +272,62 @@ INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType
 VALUES (1, '1', 'Будьте добры, укажите свой пол', NULL, 'radio', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (1, '1', '1', 'Мужчина'), (2, '1', '1', 'Женщина');
+VALUES (NULL, '1', '1', 'Мужчина'), (NULL, '1', '1', 'Женщина');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (2, '1', 'Какого цвета эта сумочка?', '/home/vadim/www/surveyzilla.dev/upload/1.jpg', 'radio', NULL, NULL);
+VALUES (2, '1', 'Какого цвета эта сумочка?', 'http://embed.polyvoreimg.com/cgi/img-thing/size/y/tid/99623953.jpg', 'radio', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (3, '1', '2', 'Красного'), (4, '1', '2', 'Синего');
+VALUES (NULL, '1', '2', 'Красного'), (NULL, '1', '2', 'Синего');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (3, '1', 'Какого цвета этот автомобиль?', '/home/vadim/www/surveyzilla.dev/upload/2.jpg', 'radio', NULL, NULL);
+VALUES (3, '1', 'Какого цвета этот автомобиль?', 'http://www.34cars.ru/images/cms/thumbs/ea0387b33b22c8a3c517e76331b916c618053ecb/mazda_6_730_auto_png.png', 'radio', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (5, '1', '3', 'Красного'), (6, '1', '3', 'Синего');
+VALUES (NULL, '1', '3', 'Красного'), (NULL, '1', '3', 'Синего');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
 VALUES (4, '1', 'Вы различаете цвета, это здорово! Идем дальше?', NULL, 'radio', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (7, '1', '4', 'Да'), (8, '1', '4', 'Не надо');
+VALUES (NULL, '1', '4', 'Да'), (NULL, '1', '4', 'Не надо');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (5, '1', '', NULL, 'radio', 1, 'Вы не различаете цвета. Очень жаль, но для Вас опрос окончен :-(');
+VALUES (5, '1', NULL, NULL, 'radio', 1, 'Вы не различаете цвета. Очень жаль, но для Вас опрос окончен :-(');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (6, '1', 'Чем из этого Вы умеет пользоваться?', NULL, 'checkbox', NULL, NULL);
+
+INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
+VALUES (NULL, '1', '6', 'HTML'), (NULL, '1', '6', 'CSS'), (NULL, '1', '6', 'PHP');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (7, '1', NULL, NULL, 'radio', 1, 'Будет здорово, когда Вы выучите еще что-нибудь кроме HTML ;-)');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (8, '1', NULL, NULL, 'radio', 1, 'Будет здорово, когда Вы выучите еще что-нибудь кроме CSS ;-)');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (9, '1', NULL, NULL, 'radio', 1, 'PHP это круто!');
+
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
+VALUES (10, '1', NULL, NULL, 'radio', 1, 'Вы знаете все это? Здорово!');
+
+
 
 -- Creating logic for the sample poll
 INSERT INTO `surveyzilla`.`Logic` (`PollId`, `ItemId`, `Options`, `NextItemId`)
 VALUES 
 ('1', '1', '1', '3'),
 ('1', '1', '2', '2'),
-('1', '2', '3', '4'),
-('1', '2', '4', '5'),
-('1', '3', '5', '4'),
-('1', '3', '6', '5'),
-('1', '4', '7', '6'),
-('1', '4', '8', '0');
+('1', '2', '1', '4'),
+('1', '2', '2', '5'),
+('1', '3', '1', '4'),
+('1', '3', '2', '5'),
+('1', '4', '1', '6'),
+('1', '4', '2', '0'),
+('1', '6', '1', '7'),
+('1', '6', '2', '8'),
+('1', '6', '4', '9'),
+('1', '6', '7', '10'),
+('1', '6', '0', '0');

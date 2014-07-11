@@ -77,13 +77,23 @@ class PollDAOMySQL implements IPollDAO
         }
         // Getting options for the Item
         $options = array();
-        $sql = "SELECT `Id`, `OptionText` FROM `ItemOptions` "
-             . "WHERE `PollId` = '$pollId' AND `ItemId` = '$itemId'";
-        foreach ($dbh->query($sql) as $option) {
-            $options[$option['Id']] = $option['OptionText'];
+        $sql = "SELECT `OptionText` FROM `ItemOptions` "
+             . "WHERE `PollId` = '$pollId' AND `ItemId` = '$itemId' "
+             . "ORDER BY `PollId`";
+        $stmt = $dbh->query($sql);
+        $resultArr = $stmt->fetchAll(\PDO::FETCH_NUM);
+        foreach ($resultArr as $key => $option) {
+            $options[$key + 1] = $option[0];
         }
         $item->options = $options;
         return $item;
+    }
+    public function getCurrentItem($token) {
+        $ans = $this->getTempAnswer($token);
+        if (!isset($ans->currentItem)) {
+            throw new Exception('$currentItem not set!');
+        }
+        return $this->getItem($ans->pollId, $ans->currentItem);
     }
     /**
      * 
@@ -93,10 +103,10 @@ class PollDAOMySQL implements IPollDAO
     public function getNextItem($token) {
         // Let's decide what should be next item according to the answers
         $ans = $this->getTempAnswer($token);
-        if (empty($ans->items)) {
-            // If no answer yet, just display the first one
-            return $this->getItem($ans->pollId, 1);
-        }
+        //var_dump($ans);
+        //var_dump($ans->pollId);
+        //var_dump($ans->currentItem);
+        //var_dump($ans->getCurrentOpts());
         // Using Logic to find next Item
         $dbh = DbConnection::getInstance()->getHandler();
         $stmt = $dbh->prepare(
@@ -109,6 +119,7 @@ class PollDAOMySQL implements IPollDAO
             return;
         }
         $next = $stmt->fetch(\PDO::FETCH_NUM);
+        //echo 'Logicaly next Item id:'; var_dump($next);
         if ($next[0] == 0) {
             // This was the las question, nowhere to go now.
             // Creating a specisl 'system' item to finish questioning a user
