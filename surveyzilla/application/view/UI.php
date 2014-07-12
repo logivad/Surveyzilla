@@ -17,6 +17,7 @@ abstract class UI
         'poll_notfound' => 'Опрос не найден',
         'poll_answered' => 'Вы уже отвечали на этот опрос',
         'main_page' => 'Главная',
-        'none_selected' => 'Вы ничего не выбрали!'
+        'none_selected' => 'Вы ничего не выбрали!',
+        'poll' => 'Опрос'
     );
 }

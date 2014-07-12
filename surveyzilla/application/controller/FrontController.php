@@ -174,13 +174,13 @@ class FrontController
         $view = $ctrl->runPoll();
         if (isset($view->message)) {
             $view->content = $this->renderView('message', $view);
-            $this->renderPage($view, 'itemNormal');
+            $this->renderPage($view, 'run');
         } elseif (isset ($view->item->isFinal) && $view->item->isFinal == true) {
             $view->content = $this->renderView('itemFinal', $view);
-            $this->renderPage($view, 'itemNormal');
+            $this->renderPage($view, 'run');
         } else {
             $view->content = $this->renderView('itemNormal', $view);
-            $this->renderPage($view, 'itemNormal');
+            $this->renderPage($view, 'run');
         }
     }
 }
