@@ -163,19 +163,6 @@ CREATE TABLE AnswersInternal
   PRIMARY KEY (`UserId`, `PollId`, `ItemId`)
 ) ENGINE=InnoDB;
 
--- Accumulates answer of all quizzees (not only registered on the website)
-CREATE TABLE PollResults
-(
-  `PollId` INT UNSIGNED NOT NULL,
-  `ItemId` INT UNSIGNED NOT NULL,
-  `OptionId` INT UNSIGNED NOT NULL,
-  `VotesCount` INT UNSIGNED DEFAULT 0,
-  FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
-  FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`),
-  FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`),
-  PRIMARY KEY (`PollId`, `ItemId`, `OptionId`)
-) ENGINE=InnoDB;
-
 -- List of filters for poll
 CREATE TABLE Filters
 (
