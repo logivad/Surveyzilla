@@ -18,6 +18,7 @@ abstract class UI
         'poll_answered' => 'Вы уже отвечали на этот опрос',
         'main_page' => 'Главная',
         'none_selected' => 'Вы ничего не выбрали!',
-        'poll' => 'Опрос'
+        'poll' => 'Опрос',
+        'back' => 'Назад'
     );
 }

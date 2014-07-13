@@ -1,26 +1,31 @@
-body {
-    background-image: url("../img/run-pattern.png");
+* {
     padding: 0;
     margin: 0;
+}
+body {
+    background-image: url("../img/run-pattern.png");
+    background-color: #fff;
     font-family: Verdana, Geneva, sans-serif;
 }
-div.run_poll {
-    width: 100%;
+.main-content {
+    width: 96%;
     max-width: 600px;
     margin: 0 auto;
+}
+.item-content {
+    margin: 11px auto;
     background-color: #FFF;
-    padding:0;
+    border-radius: 5px;
+    padding: 25px 15px 50px 15px;
 }
-div.content {
-    margin: 0 auto;
-    padding: 0 8px 50px 8px;
-}
-.run_poll #title {
+.title-bar {
     width: 100%;
     color: #FFF;
-    padding: 8px 0px;
     font-size: 1.2em;
     text-align: center;
+    padding: 12px 0px;
+    border-radius: 5px;
+    margin-top: 10px;
     background-image: -ms-linear-gradient(top, #00D5FF 0%, #00738A 100%);
     background-image: -moz-linear-gradient(top, #00D5FF 0%, #00738A 100%);
     background-image: -o-linear-gradient(top, #00D5FF 0%, #00738A 100%);
@@ -28,39 +33,73 @@ div.content {
     background-image: -webkit-linear-gradient(top, #00D5FF 0%, #00738A 100%);
     background-image: linear-gradient(to bottom, #00D5FF 0%, #00738A 100%);
 }
-.run_poll img {
+img {
+    display: block;
+    margin: 0 auto;
+    padding: 10px 0;
     max-width: 80%;
     height: auto;
     border: 0;
 }
-.run_poll #question {
+.question {
     font-weight: bold;
-    padding-bottom: 5px;
+    margin-bottom: 20px;
 }
-.run_poll label {
+.options {
+    margin-bottom: 15px;
+}
+label {
     display: block;
     padding: 6px;
     margin-bottom: 4px;
     background-color: #eee;
 }
-.run_poll .btn {
+.btn {
     background-color: #fff;
     border: 2px solid #aaa;
     display: block;
     float: right;
     padding: 6px 12px;
 }
-.run_poll .btn:hover {
+.btn:hover {
     background-color: #eee;
     border: 2px solid #888;
 }
-#message {
+.message {
+    margin: 40px auto;
+    text-align: center;
+}
+.message div {
+    display: inline-block;
     background-color: white;
     border: 2px solid red;
     border-radius: 10px;
-    display: block;
-    margin: 40px auto;
-    max-width: 300px;
     text-align: center;
-    padding: 10px 20px;
+    padding: 15px 20px;
+    max-width: 60%;
+}
+.message p {
+    margin-top: 5px;
+}
+
+@media screen and (max-width:480px) {
+    body {
+        background-image: none;
+    }
+    .main-content {
+        width: 100%;
+    }
+    .title-bar {
+        border-radius: 0;
+        margin-top: 0;
+    }
+    .item-content {
+        margin: 0px auto;
+        border-radius: 0;
+        padding: 20px 8px 50px 8px;
+    }
+    label {
+        padding: 10px;
+        margin-bottom: 7px;
+    }
 }

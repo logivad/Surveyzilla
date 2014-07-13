@@ -2,9 +2,7 @@
 namespace surveyzilla\application\controller;
 
 use LogicException;
-use surveyzilla\application\model\poll\Item;
-use surveyzilla\application\model\poll\Logic;
-use surveyzilla\application\model\poll\Options;
+use stdClass;
 use surveyzilla\application\model\Request;
 use surveyzilla\application\model\View;
 use surveyzilla\application\service\PollService;
@@ -42,12 +40,16 @@ class PollController
         // At leat pollId must be set (ids start from "1")
         $pollId = $this->request->get('poll');
         if (empty($pollId)){
+            $this->view->item = new stdClass();
+            $this->view->item->pollName = UI::$text['error'];
             return $this->view->setMessage(UI::$text['poll_notfound']);
         }
         // Token is a timestamp and looks like this: 1404984161.9609
         $token = filter_input(INPUT_COOKIE, 'token', FILTER_VALIDATE_FLOAT);
         // Quizze can answer the poll just once
         if (false === $this->pollService->isUniqueUser($pollId, $token)){
+            $this->view->item = new stdClass();
+            $this->view->item->pollName = UI::$text['error'];
             return $this->view->setMessage(UI::$text['poll_answered']);
         }
         // If no token is given, a new quizzee has come and he needs a token
@@ -55,6 +57,8 @@ class PollController
             // Get the first poll item if it exists
             $item = $this->pollService->getFirstItem($pollId);
             if (empty($item)) {
+                $this->view->item = new stdClass();
+                $this->view->item->pollName = UI::$text['error'];
                 return $this->view->setMessage(UI::$text['poll_notfound']);
             }
             // Create a record for temp answer and set a cookie for a token
@@ -70,7 +74,9 @@ class PollController
                 // So a user can continue poll after closing the browser
                 $item = $this->pollService->getCurrentItem($token);
                 if (empty($item)) {
-                    return $this->view->setMessage(UI::$text['error']);
+                    $this->view->item = new stdClass();
+                    $this->view->item->pollName = '';
+                    return $this->view->setMessage(UI::$text['error'].' '.UI::$text['poll_notfound']);
                 }
                 $this->view->item = $item;
                 return $this->view;
@@ -84,7 +90,11 @@ class PollController
                     // Imitating such selection that default next Item fires
                     $this->request->set('opts', array(-1));
                 } elseif ($item->inputType === 'radio') {
-                    return $this->view->setMessage(UI::$text['none_selected']);
+                    $this->view->item = $item;
+                    $msg = UI::$text['none_selected'] . '<br>'
+                         . '<p><a href="index.php?a=run&poll=' . $item->pollId
+                         . '">' . UI::$text['back'] . '</a></p>';
+                    return $this->view->setMessage($msg);
                 }
             }
             // Quizzee has an answer, let's save it to TempAnswer
@@ -99,12 +109,15 @@ class PollController
             $item = $this->pollService->getNextItem($token);
             //echo 'next Item:';var_dump($item);
             if (empty($item)) {
+                $this->view->item = new stdClass();
+                $this->view->item->pollName = '';
                 return $this->view->setMessage(UI::$text['error']);
             }
             // When poll is finished and no Final Item is provided
             // (Logic nextItem == 0), DAO returns a special 'system' Item with
             // isSystemFinal set to TRUE
             if ($item->isSystemFinal) {
+                $this->view->item = $item;
                 $this->pollService->processTempAnswer($token);
                 return $this->view->setMessage(UI::$text['poll_end']);
             }
