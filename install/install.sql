@@ -122,7 +122,7 @@ CREATE TABLE `PollItems`
 -- List of options for a poll item
 -- When a poll item is deleted from PollItems table, corresponding records from
 -- this table are also deleted (cascade delition)
-CREATE TABLE ItemOptions
+CREATE TABLE `ItemOptions`
 (
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `PollId` INT UNSIGNED NOT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE ItemOptions
 
 -- Logic router. Determines which item (question) will go next based on
 -- current item and selected option
-CREATE TABLE Logic
+CREATE TABLE `Logic`
 (
   `PollId` INT UNSIGNED NOT NULL,
   `ItemId` INT UNSIGNED NOT NULL,
@@ -150,8 +150,9 @@ CREATE TABLE Logic
 
 -- If poll creator wishes, every answer of a registered quizzee is
 -- recorder here (this is set in Polls.ReportingMask)
-CREATE TABLE AnswersInternal
+CREATE TABLE `Answers`
 (
+  `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `UserId` INT UNSIGNED NOT NULL,
   `PollId` INT UNSIGNED NOT NULL,
   `ItemId` INT UNSIGNED NOT NULL,
@@ -160,20 +161,20 @@ CREATE TABLE AnswersInternal
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
   FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`),
   FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`),
-  PRIMARY KEY (`UserId`, `PollId`, `ItemId`)
+  PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB;
 
 -- List of filters for poll
-CREATE TABLE Filters
+CREATE TABLE `Filters`
 (
-  `Id` INT NOT NULL AUTO_INCREMENT,
+  `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Name` VARCHAR(30),
   PRIMARY KEY (`Id`)
 );
 
 -- If this filter used, only registered users with given ID's
 -- are allowed to run the poll
-CREATE TABLE FilterPollAllowUserId
+CREATE TABLE `FilterPollAllowUserId`
 (
   `PollId` INT UNSIGNED NOT NULL,
   `UserId` INT UNSIGNED NOT NULL,

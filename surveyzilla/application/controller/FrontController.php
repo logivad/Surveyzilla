@@ -31,7 +31,7 @@ class FrontController
             http_response_code(404);
             $view = new \stdClass();
             $view->message = 'Странно.. страница не отобразилась';
-            return renderView('message', $view);
+            return $this->renderView('runMessage', $view);
         }
         // Формируем содержание страницы (будет включено в шаблон)
         ob_start();
