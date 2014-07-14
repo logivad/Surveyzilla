@@ -52,7 +52,7 @@ class UserController
             }
         } else {
             $this->view->isAuthorized = false;
-            $this->view->message = UI::$text['acces_denied'];
+            $this->view->message = UI::$lang['acces_denied'];
         }
         return $this->view;
     }
@@ -63,7 +63,7 @@ class UserController
             return $this->view;
         } else {
             $this->view->isAdmin = false;
-            $this->view->message = UI::$text['acces_denied'];
+            $this->view->message = UI::$lang['acces_denied'];
         }
         return $this->view;
     }
@@ -77,10 +77,10 @@ class UserController
             || $userPrey === false
             || !$user->isAdmin() && $this->request->getParam('id') !== $user->getId()
             ){
-            $this->view->message = UI::$text['acces_denied'];
+            $this->view->message = UI::$lang['acces_denied'];
             return $this->view;
         }
-        $this->view->message = $this->service->deleteUser($this->request->getParam('id')) ? UI::$text['success'] : UI::$text['error'];
+        $this->view->message = $this->service->deleteUser($this->request->getParam('id')) ? UI::$lang['success'] : UI::$lang['error'];
         return $this->view;
     }
     public function showAdminPage(){
@@ -92,7 +92,7 @@ class UserController
             $this->view->userName = $user->getName();
         } else {
             http_response_code(403);
-            $this->view->message = UI::$text['acces_denied'];
+            $this->view->message = UI::$lang['acces_denied'];
         }
         return $this->view;
     }
@@ -109,14 +109,14 @@ class UserController
                 !$this->request->isSetParam('password')){
             $this->view->isAuthorized = false;
             $this->view->message = '';
-            $this->view->title = UI::$text['log-in'];
+            $this->view->title = UI::$lang['log-in'];
             return $this->view;
         }
         // Если пользователь отправил данные для авторизации
         if ($this->service->authorize($this->request->get('email'), $this->request->get('password'))){
             // Пользователь успешно авторизован
             $this->view->isAuthorized = true;
-            //$this->view->message = UI::$text['success'];
+            //$this->view->message = UI::$lang['success'];
             /* Далее фронт-контроллер отобразит личную страницу пользоватлея,
              * поэтому запишем данные пользователя в объект вида
              */
@@ -129,13 +129,13 @@ class UserController
             return $this->view;
         } else {
             $this->view->isAuthorized = false;
-            $this->view->message = UI::$text['bad_login'];
+            $this->view->message = UI::$lang['bad_login'];
             $this->view->title = 'войти';
             return $this->view;
         }
     }
     public function showMainPage() {
-        $this->view->title = UI::$text['main_page'];
+        $this->view->title = UI::$lang['main_page'];
         return $this->service->isAuthorized($this->view);
     }
     public function showAccount() {
@@ -144,7 +144,7 @@ class UserController
     }
     public function addUser(){
         if (!$this->service->isAuthorizedAdmin()){
-            $this->view->message = UI::$text['acces_denied'];
+            $this->view->message = UI::$lang['acces_denied'];
             return $this->view;
         }
         // Создаем пользователя определенного типа (тип указан в запросе)
@@ -163,7 +163,7 @@ class UserController
             $privileges->setId($user->getId());
             $privileges->setPrivilegesByRole($user->getRoleset());
             if (true !== $this->service->addUserPrivileges($privileges)){
-                $this->view->message = UI::$text['error'];
+                $this->view->message = UI::$lang['error'];
                 return $this->view;
             }
         }
@@ -173,12 +173,12 @@ class UserController
     public function updateUser(){
         // Обновление данных пользователя (может лишь сам пользователь и админ)
         if (false === $user = $this->service->findUserById($this->request->getParam('id'))){
-            $this->view->message = UI::$text['error'];
+            $this->view->message = UI::$lang['error'];
             return $this->view;
         }
         if (!$this->service->isAuthorizedUserId($this->request->getParam('id'))
             || !$this->service->isAuthorizedAdmin()){
-            $this->view->message = UI::$text['acces_denied'];
+            $this->view->message = UI::$lang['acces_denied'];
             return $this->view;
         }
         // Только у InternalUser есть пароль, установим его
@@ -189,7 +189,7 @@ class UserController
         $user->setName($this->request->getParam('name'));
         $user->setEmail($this->request->getParam('email'));
         $this->view->message = $this->service->
-            updateUser($user) ?  UI::$text['success'] :  UI::$text['error'];
+            updateUser($user) ?  UI::$lang['success'] :  UI::$lang['error'];
         return $this->view;
     }
 }

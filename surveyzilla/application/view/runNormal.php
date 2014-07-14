@@ -1,4 +1,6 @@
-
+<?php
+use surveyzilla\application\view\UI;
+?>
         <form action="index.php" method="GET">
             <p class="question"><?php echo $view->item->questionText ?></p>
             <?php
@@ -15,5 +17,5 @@
             </div>
             <input type="hidden" name="a" value="run" />
             <input type="hidden" name="poll" value="<?php echo $view->item->pollId ?>" />
-            <p><input type="submit" name="submit" value="Далее" class="btn" /></p>
+            <p><input type="submit" name="submit" value="<?php echo UI::$lang['next'] ?>" class="btn" /></p>
         </form>

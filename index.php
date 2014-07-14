@@ -1,7 +1,7 @@
 <?php
 
 namespace surveyzilla\application;
-use surveyzilla\application\controller\FrontController;
+use surveyzilla\application\controller\Application;
 
 date_default_timezone_set('Europe/Kiev');
 
@@ -11,6 +11,6 @@ function autoload($className){
 }
 spl_autoload_register('surveyzilla\application\autoload');
 
-// Front controller receives $_REQUEST, looks at it's 'a' (action) value and
-// launches corresponding action
-$fc = new FrontController($_REQUEST);
+$sz = new Application($_REQUEST);
+$sz->setLanguage(Config::$lang);
+$sz->launchAction();

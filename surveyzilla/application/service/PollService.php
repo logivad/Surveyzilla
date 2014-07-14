@@ -46,7 +46,7 @@ class PollService
         $ans = $this->pollDAO->getTempAnswer($token);
         $ans->addItem($ans->currentItem, $custopt, $options);
         if (!$this->pollDAO->updateTempAnswer($ans)) {
-            throw new Exception(UI::$text['error']);
+            throw new Exception(UI::$lang['error']);
         }
         //echo 'new:';var_dump($ans);
     }
@@ -64,7 +64,7 @@ class PollService
         }
         $ans->$param = $value;
         if (!$this->pollDAO->updateTempAnswer($ans)) {
-            throw new Exception(UI::$text['error']);
+            throw new Exception(UI::$lang['error']);
         }
         return $ans;
     }

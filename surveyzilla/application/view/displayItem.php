@@ -17,7 +17,7 @@
             echo "\n\t<input type=\"$inputType\" name=\"options[]\" value=\"$i\">$optionList[$i]<br />";
         }
         if ($view->item->getOptions()->customFieldAllowed()){
-            echo "\n\t<input type=\"text\" name=\"customOption\" placeholder=\"".UI::$text['enterCustOp'].'"><br />';
+            echo "\n\t<input type=\"text\" name=\"customOption\" placeholder=\"".UI::$lang['enterCustOp'].'"><br />';
         }
         echo "\n\t<input type=\"hidden\" name=\"pollId\" value=\"{$view->pollId}\">",
              "\n\t<input type=\"hidden\" name=\"itemId\" value=\"{$view->item->getId()}\">",

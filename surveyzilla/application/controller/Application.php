@@ -1,18 +1,20 @@
 <?php
 namespace surveyzilla\application\controller;
-use surveyzilla\application\model\Request,
-    surveyzilla\application\controller\UserController,
-    surveyzilla\application\controller\PollController,
-    surveyzilla\application\model\View;
 
-class FrontController
+use stdClass;
+use surveyzilla\application\controller\PollController;
+use surveyzilla\application\controller\UserController;
+use surveyzilla\application\view\UI;
+use surveyzilla\application\model\Request;
+use surveyzilla\application\model\View;
+
+class Application
 {
     // Request object, contains params from $_REQUEST
     private $request;
     
     public function __construct($request) {
         $this->request = new Request($request);
-        $this->launchAction();
     }
     /**
      * Takes a name of the desired view (from application/view) and an object
@@ -29,7 +31,7 @@ class FrontController
         // Если не найден файл вида, выдаем сообщение об ошибки и ответ 403
         if (!file_exists("surveyzilla/application/view/$viewName.php")) {
             http_response_code(404);
-            $view = new \stdClass();
+            $view = new stdClass();
             $view->message = 'Странно.. страница не отобразилась';
             return $this->renderView('runMessage', $view);
         }
@@ -65,7 +67,7 @@ class FrontController
      * launces, if not - user gets 'not found' message
      * 
      */
-    private function launchAction() {
+    public function launchAction() {
         if ($this->request->isSetParam('a')) {
             $actionName = $this->request->get('a');
         } else {
@@ -81,6 +83,13 @@ class FrontController
             $view->content = $this->renderView('404');
             $this->renderPage($view);
         }
+    }
+    /**
+     * 
+     * @param type $lang Language to use ('ru')
+     */
+    public function setLanguage($lang) {
+        UI::setLang($lang);
     }
     /**
      * Main page of the website

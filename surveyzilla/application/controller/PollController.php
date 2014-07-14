@@ -41,16 +41,16 @@ class PollController
         $pollId = $this->request->get('poll');
         if (empty($pollId)){
             $this->view->item = new stdClass();
-            $this->view->item->pollName = UI::$text['error'];
-            return $this->view->setMessage(UI::$text['poll_notfound']);
+            $this->view->item->pollName = UI::$lang['error'];
+            return $this->view->setMessage(UI::$lang['poll_notfound']);
         }
         // Token is a timestamp and looks like this: 1404984161.9609
         $token = filter_input(INPUT_COOKIE, 'token', FILTER_VALIDATE_FLOAT);
         // Quizze can answer the poll just once
         if (false === $this->pollService->isUniqueUser($pollId, $token)){
             $this->view->item = new stdClass();
-            $this->view->item->pollName = UI::$text['error'];
-            return $this->view->setMessage(UI::$text['poll_answered']);
+            $this->view->item->pollName = UI::$lang['error'];
+            return $this->view->setMessage(UI::$lang['poll_answered']);
         }
         // If no token is given, a new quizzee has come and he needs a token
         if (empty($token)){
@@ -58,8 +58,8 @@ class PollController
             $item = $this->pollService->getFirstItem($pollId);
             if (empty($item)) {
                 $this->view->item = new stdClass();
-                $this->view->item->pollName = UI::$text['error'];
-                return $this->view->setMessage(UI::$text['poll_notfound']);
+                $this->view->item->pollName = UI::$lang['error'];
+                return $this->view->setMessage(UI::$lang['poll_notfound']);
             }
             // Create a record for temp answer and set a cookie for a token
             $this->pollService->createTempAnswer($pollId);
@@ -76,7 +76,7 @@ class PollController
                 if (empty($item)) {
                     $this->view->item = new stdClass();
                     $this->view->item->pollName = '';
-                    return $this->view->setMessage(UI::$text['error'].' '.UI::$text['poll_notfound']);
+                    return $this->view->setMessage(UI::$lang['error'].' '.UI::$lang['poll_notfound']);
                 }
                 $this->view->item = $item;
                 return $this->view;
@@ -91,9 +91,9 @@ class PollController
                     $this->request->set('opts', array(-1));
                 } elseif ($item->inputType === 'radio') {
                     $this->view->item = $item;
-                    $msg = UI::$text['none_selected'] . '<br>'
+                    $msg = UI::$lang['none_selected'] . '<br>'
                          . '<p><a href="index.php?a=run&poll=' . $item->pollId
-                         . '">' . UI::$text['back'] . '</a></p>';
+                         . '">' . UI::$lang['back'] . '</a></p>';
                     return $this->view->setMessage($msg);
                 }
             }
@@ -111,7 +111,7 @@ class PollController
             if (empty($item)) {
                 $this->view->item = new stdClass();
                 $this->view->item->pollName = '';
-                return $this->view->setMessage(UI::$text['error']);
+                return $this->view->setMessage(UI::$lang['error']);
             }
             // When poll is finished and no Final Item is provided
             // (Logic nextItem == 0), DAO returns a special 'system' Item with
@@ -119,7 +119,7 @@ class PollController
             if ($item->isSystemFinal) {
                 $this->view->item = $item;
                 $this->pollService->processTempAnswer($token);
-                return $this->view->setMessage(UI::$text['poll_end']);
+                return $this->view->setMessage(UI::$lang['poll_end']);
             }
             if ($item->isFinal) {
                 // The last item appeared, which means the poll is finished.
