@@ -1,0 +1,10 @@
+This directory is used for storing temp answers.
+
+Each file here is a serialized Answer object that is renewed every time a user
+answers a question. Files are named by creation date - microtime(true) function.
+
+After a poll has been completely answered, corresponding file in this folder is
+automatically deleted.
+
+If for some reason there are files here, they must be deleted in a three days
+after they were created (via cron).
