@@ -9,9 +9,11 @@ use surveyzilla\application\model\poll\Item;
 use surveyzilla\application\model\poll\Poll;
 use surveyzilla\application\service\PollService;
 
-class PollDAOMySQL implements IPollDAO
+class PollDAO implements IPollDAO
 {
     private static $_instance;
+    // Directory for temp answer files
+    private $tempAnsDir = 'temp/';
     private function __construct(){
         /*empty*/
     }
@@ -34,32 +36,38 @@ class PollDAOMySQL implements IPollDAO
         
     }
     public function addTempAnswer(Answer $ans) {
-        $dbh = DbConnection::getInstance()->getHandler();
-        $stmt = $dbh->prepare(
-            'INSERT INTO `AnswerTemp`(`Token`, `AnswerObj`) VALUES (?,?)'
-        );
-        return $stmt->execute(array($ans->token, serialize($ans)));
+//        $dbh = DbConnection::getInstance()->getHandler();
+//        $stmt = $dbh->prepare(
+//            'INSERT INTO `AnswerTemp`(`Token`, `AnswerObj`) VALUES (?,?)'
+//        );
+//        return $stmt->execute(array($ans->token, serialize($ans)));
+        return file_put_contents($this->tempAnsDir . $ans->token, serialize($ans));
     }
     public function getTempAnswer($token) {
-        $dbh = DbConnection::getInstance()->getHandler();
-        $sql = "SELECT `AnswerObj` FROM `AnswerTemp` "
-             . "WHERE `Token` = '$token'";
-        $stmt = $dbh->query($sql);
-        $ans = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (empty($ans)) {
-            return;
-        }
-        return unserialize($ans['AnswerObj']);
+//        $dbh = DbConnection::getInstance()->getHandler();
+//        $sql = "SELECT `AnswerObj` FROM `AnswerTemp` "
+//             . "WHERE `Token` = '$token'";
+//        $stmt = $dbh->query($sql);
+//        $ans = $stmt->fetch(PDO::FETCH_ASSOC);
+//        if (empty($ans)) {
+//            return;
+//        }
+//        return unserialize($ans['AnswerObj']);
+        return unserialize(file_get_contents($this->tempAnsDir . $token));
     }
     public function updateTempAnswer(Answer $ans) {
-        $dbh = DbConnection::getInstance()->getHandler();
-        $stmt = $dbh->prepare('UPDATE AnswerTemp SET AnswerObj = ? '
-                            . 'WHERE Token = ?');
-        return $stmt->execute(array(serialize($ans), $ans->token));
+//        $dbh = DbConnection::getInstance()->getHandler();
+//        $stmt = $dbh->prepare('UPDATE AnswerTemp SET AnswerObj = ? '
+//                            . 'WHERE Token = ?');
+//        return $stmt->execute(array(serialize($ans), $ans->token));
+        return $this->addTempAnswer($ans);
     }
     public function deleteTempAnswer($token) {
-        $dbh = DbConnection::getInstance()->getHandler();
-        $dbh->exec("DELETE FROM AnswerTemp WHERE Token = $token");
+//        $dbh = DbConnection::getInstance()->getHandler();
+//        $dbh->exec("DELETE FROM AnswerTemp WHERE Token = $token");
+        if (file_exists($this->tempAnsDir . $token)) {
+            unlink($this->tempAnsDir . $token);
+        }
     }
     /**
      * Returns Item object filled with data for a given item

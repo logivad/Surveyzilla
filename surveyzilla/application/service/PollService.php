@@ -1,7 +1,7 @@
 <?php
 namespace surveyzilla\application\service;
 
-use surveyzilla\application\dao\PollDAOMySQL;
+use surveyzilla\application\dao\PollDAO;
 use surveyzilla\application\model\poll\Answer;
 use surveyzilla\application\view\UI;
 
@@ -16,7 +16,7 @@ class PollService
     public static function getInstance(){
         if (null === self::$_instance){
             self::$_instance = new self();
-            self::$_instance->pollDAO = PollDAOMySQL::getInstance();
+            self::$_instance->pollDAO = PollDAO::getInstance();
         }
         return self::$_instance;
     }

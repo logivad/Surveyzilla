@@ -186,12 +186,12 @@ CREATE TABLE `FilterPollAllowUserId`
 -- Table for storing temporary Answer objects
 -- When a user finishes answering a poll, corresponding record 
 -- from this table is deleted
-CREATE TABLE `AnswerTemp`
-(
-  `Token` DECIMAL(14,4) NOT NULL COMMENT 'PHP microtime, float',
-  `AnswerObj` VARCHAR(500) NOT NULL,
-  PRIMARY KEY (`Token`)
-);
+-- CREATE TABLE `AnswerTemp`
+-- (
+--   `Token` DECIMAL(14,4) NOT NULL COMMENT 'PHP microtime, float',
+--   `AnswerObj` VARCHAR(500) NOT NULL,
+--   PRIMARY KEY (`Token`)
+-- );
 
 
 -- -----------------

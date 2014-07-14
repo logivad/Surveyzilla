@@ -3,7 +3,7 @@ namespace surveyzilla\application\service;
 
 use LogicException;
 use surveyzilla\application\Config;
-use surveyzilla\application\dao\UserDAOMySQL;
+use surveyzilla\application\dao\UserDAO;
 use surveyzilla\application\model\user\FBUser;
 use surveyzilla\application\model\user\GPUser;
 use surveyzilla\application\model\user\InternalUser;
@@ -20,7 +20,7 @@ class UserService
     public static function getInstance(){
         if (null === self::$_instance){
             self::$_instance = new self();
-            self::$_instance->userDAO = UserDAOMySQL::getInstance();
+            self::$_instance->userDAO = UserDAO::getInstance();
         }
         return self::$_instance;
     }

@@ -5,7 +5,7 @@ use surveyzilla\application\model\user\User,
     surveyzilla\application\service\UserService,
     surveyzilla\application\Config,
     surveyzilla\application\dao\DbConnection;
-class UserDAOMySQL implements IUserDAO
+class UserDAO implements IUserDAO
 {
     private $service;
     private static $_instance;
