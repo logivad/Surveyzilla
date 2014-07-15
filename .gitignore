@@ -1,1 +1,5 @@
+# ignore netbeans prorect files
 nbproject
+# ignore temp answer files, but track info file
+temp/
+!temp/info
