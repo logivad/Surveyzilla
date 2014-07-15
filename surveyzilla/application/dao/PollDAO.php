@@ -35,6 +35,26 @@ class PollDAO implements IPollDAO
     public function deletePoll($id) {
         
     }
+    /**
+     * Inserts answer data to a database (appends it to the `Answers` table)
+     * @param \surveyzilla\application\model\poll\Answer $ans Answer object
+     * @return boolean Returns TRUE on success or FALSE on failure
+     */
+    public function processTempAnswer(Answer $ans) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $sql = '';
+        foreach ($ans->items as $itemId => $val) {
+            $options = implode(',', $val['optsArr']);
+            $custom = ($val['custopt']) ? $val['custopt'] : '';
+            $sql .= "INSERT INTO Answers (PollId, ItemId, Options, CustomText) "
+                 . "VALUES ({$ans->pollId}, $itemId, '$options', '$custom');";
+        }
+        $stmt = $dbh->prepare($sql);
+        if (false == $stmt->execute()) {
+            return false;
+        }
+        return true;
+    }
     public function saveTempAnswer(Answer $ans) {
         return file_put_contents($this->tempAnsDir . $ans->token, serialize($ans));
     }
@@ -125,15 +145,26 @@ class PollDAO implements IPollDAO
             $item->isSystemFinal = true;
             // Let's find out whethe statistics should be displayed
             $stmt = $dbh->prepare(
-                "SELECT ShowStat FROM Polls WHERE Id = {$ans->pollId}"
+                "SELECT ShowStat, Id FROM Polls WHERE Id = {$ans->pollId}"
             );
             $stmt->execute();
-            $res = $stmt->fetch(PDO::FETCH_NUM);
-            if ($res[0]) {
+            $res = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($res['ShowStat']) {
                 $item->pollShowStat = true;
             }
+            $item->pollId = $res['Id'];
             return $item;
         }
         return $this->getItem($ans->pollId, $nextItemId);
+    }
+    public function getPollAnswers($pollId) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->prepare(
+            "SELECT * FROM Answers WHERE PollId = $pollId"
+        );
+        if (false == $stmt->execute()) {
+            throw new Exception('Cannot get statistics!');
+        }
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

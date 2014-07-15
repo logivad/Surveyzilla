@@ -42,6 +42,7 @@ class Answer
         $this->items[$itemId] = array(
             'custopt' => $custom,
             'opts' => (int) $bitMask,
+            'optsArr' => $options,
             'stat' => ($inStat) ? true : false
         );
     }

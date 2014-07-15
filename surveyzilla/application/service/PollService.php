@@ -1,6 +1,8 @@
 <?php
 namespace surveyzilla\application\service;
 
+use Exception;
+use RuntimeException;
 use surveyzilla\application\dao\PollDAO;
 use surveyzilla\application\model\poll\Answer;
 use surveyzilla\application\view\UI;
@@ -96,12 +98,12 @@ class PollService
      * @param type $token
      */
     public function processTempAnswer($token) {
-        $ans = $this->pollDAO->getTempAnswer($token);
-        unset($ans->pollId, $ans->currentItem, $ans->items);
-        $ans->completed = true;
-        $this->pollDAO->saveTempAnswer($ans);
-        $this->pollDAO->deleteTempAnswer($token);
         setcookie('token', NULL, time() - 10000);
+        $ans = $this->pollDAO->getTempAnswer($token);
+        $this->pollDAO->deleteTempAnswer($token);
+        if (!$this->pollDAO->processTempAnswer($ans)) {
+            throw new RuntimeException('Error processing the answer');
+        }
     }
     public function makeLogicArray(array $queryResult) {
         /*
@@ -128,8 +130,12 @@ class PollService
      * @return object $view Returns an array filled with stat. data
      */
     public function getStat($pollId) {
-        $stat = array();
-        // TODO: fill the stat
+        $stat = $this->pollDAO->getPollAnswers($pollId);
+        // Options is a list of comma separated options' numbers,
+        // let's make it an array
+        for ($i = 0, $len = sizeof($stat); $i < $len; $i++) {
+            $stat[$i]['Options'] = explode(',', $stat[$i]['Options']);
+        }
         return $stat;
     }
 }

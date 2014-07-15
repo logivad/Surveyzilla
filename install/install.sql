@@ -157,14 +157,15 @@ CREATE TABLE `Logic`
 CREATE TABLE `Answers`
 (
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `UserId` INT UNSIGNED NOT NULL,
+  `UserId` INT UNSIGNED,
   `PollId` INT UNSIGNED NOT NULL,
   `ItemId` INT UNSIGNED NOT NULL,
-  `OptionId` INT UNSIGNED NOT NULL,
-  `CustomText` VARCHAR(255),
+  /*`OptionId` INT UNSIGNED NOT NULL,*/
+  `Options` CHAR(255),
+  `CustomText` CHAR(255),
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
   FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`),
-  FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`),
+  /*FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`),*/
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB;
 

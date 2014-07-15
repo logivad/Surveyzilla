@@ -1,3 +1,5 @@
 <div class="stat">
-Статистика по опросу
+    <p><b>Статистика по опросу</b></p>
+    <br/>
+    <?php var_dump($view->stat) ?>
 </div>
