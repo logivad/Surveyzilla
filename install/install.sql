@@ -94,6 +94,8 @@ CREATE TABLE `Polls`
     COMMENT 'Bit mask, defines which filters are used',
   `ReportingMask` TINYINT UNSIGNED DEFAULT 0
     COMMENT 'Bit mask, defines What data to gather',
+  `ShowStat` BOOLEAN DEFAULT TRUE 
+    COMMENT 'Whether to show statistics after the last item',
   FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE CASCADE,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB;
@@ -289,7 +291,7 @@ INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType
 VALUES (6, '1', 'Чем из этого Вы умеете пользоваться?', NULL, 'checkbox', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (NULL, '1', '6', 'HTML'), (NULL, '1', '6', 'CSS'), (NULL, '1', '6', 'PHP'), (NULL, '1', '6', 'Чё это ваще за букавки?');
+VALUES (NULL, '1', '6', 'HTML'), (NULL, '1', '6', 'CSS'), (NULL, '1', '6', 'PHP');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
 VALUES (7, '1', NULL, NULL, 'radio', 1, 'Будет здорово, когда Вы выучите еще что-нибудь кроме HTML ;-)');
@@ -298,16 +300,16 @@ INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType
 VALUES (8, '1', NULL, NULL, 'radio', 1, 'Будет здорово, когда Вы выучите еще что-нибудь кроме CSS ;-)');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (9, '1', NULL, NULL, 'radio', 1, 'PHP это круто!');
+VALUES (9, '1', NULL, NULL, 'radio', 1, 'PHP это круто, будете бэк-эндщиком!');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (10, '1', NULL, NULL, 'radio', 1, 'Вы знаете все это? Здорово!');
+VALUES (10, '1', NULL, NULL, 'radio', 1, 'Вы знаете все это? Круто!');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
 VALUES (11, '1', NULL, NULL, 'radio', 1, 'А умели бы всё, вас бы похвалили!');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (12, '1', NULL, NULL, 'radio', 1, 'Лузер!');
+VALUES (12, '1', NULL, NULL, 'radio', 1, 'Будете фронт-эндщиком!');
 
 -- Creating logic for the sample poll
 INSERT INTO `surveyzilla`.`Logic` (`PollId`, `ItemId`, `Options`, `NextItemId`)
@@ -324,5 +326,5 @@ VALUES
 ('1', '6', '2', '8'),
 ('1', '6', '4', '9'),
 ('1', '6', '7', '10'),
-('1', '6', '8', '12'),
-('1', '6', '0', '11');
+('1', '6', '3', '12'),
+('1', '6', '0', '0');

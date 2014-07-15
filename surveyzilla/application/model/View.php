@@ -17,6 +17,7 @@ class View
     public $itemQuestion;
     public $options = array();
     public $loggedOff;              // TRUE when user has just logged-off
+    public $stat;                   // container for statistics on a poll
     
     /**
      * Sets the message and returns the object itself. Just a useful function

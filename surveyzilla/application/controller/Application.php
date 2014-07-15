@@ -183,13 +183,13 @@ class Application
         $view = $ctrl->runPoll();
         if (isset($view->message)) {
             $view->content = $this->renderView('runMessage', $view);
-            $this->renderPage($view, 'run');
         } elseif (isset ($view->item->isFinal) && $view->item->isFinal == true) {
             $view->content = $this->renderView('runFinal', $view);
-            $this->renderPage($view, 'run');
+        } elseif (isset ($view->stat)) {
+            $view->content = $this->renderView('runStat', $view);
         } else {
             $view->content = $this->renderView('runNormal', $view);
-            $this->renderPage($view, 'run');
         }
+        $this->renderPage($view, 'run');
     }
 }

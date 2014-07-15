@@ -16,4 +16,6 @@ class Item
     public $finalLink;
     public $finalComment;
     public $options;
+    // Poll parameter, whether to show statistics when answered
+    public $pollShowStat;
 }

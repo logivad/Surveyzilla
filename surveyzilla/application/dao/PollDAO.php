@@ -35,36 +35,13 @@ class PollDAO implements IPollDAO
     public function deletePoll($id) {
         
     }
-    public function addTempAnswer(Answer $ans) {
-//        $dbh = DbConnection::getInstance()->getHandler();
-//        $stmt = $dbh->prepare(
-//            'INSERT INTO `AnswerTemp`(`Token`, `AnswerObj`) VALUES (?,?)'
-//        );
-//        return $stmt->execute(array($ans->token, serialize($ans)));
+    public function saveTempAnswer(Answer $ans) {
         return file_put_contents($this->tempAnsDir . $ans->token, serialize($ans));
     }
     public function getTempAnswer($token) {
-//        $dbh = DbConnection::getInstance()->getHandler();
-//        $sql = "SELECT `AnswerObj` FROM `AnswerTemp` "
-//             . "WHERE `Token` = '$token'";
-//        $stmt = $dbh->query($sql);
-//        $ans = $stmt->fetch(PDO::FETCH_ASSOC);
-//        if (empty($ans)) {
-//            return;
-//        }
-//        return unserialize($ans['AnswerObj']);
         return unserialize(file_get_contents($this->tempAnsDir . $token));
     }
-    public function updateTempAnswer(Answer $ans) {
-//        $dbh = DbConnection::getInstance()->getHandler();
-//        $stmt = $dbh->prepare('UPDATE AnswerTemp SET AnswerObj = ? '
-//                            . 'WHERE Token = ?');
-//        return $stmt->execute(array(serialize($ans), $ans->token));
-        return $this->addTempAnswer($ans);
-    }
     public function deleteTempAnswer($token) {
-//        $dbh = DbConnection::getInstance()->getHandler();
-//        $dbh->exec("DELETE FROM AnswerTemp WHERE Token = $token");
         if (file_exists($this->tempAnsDir . $token)) {
             unlink($this->tempAnsDir . $token);
         }
@@ -79,7 +56,7 @@ class PollDAO implements IPollDAO
         // Getting Item from DB (without options)
         $sql = "SELECT pi.id, pi.pollId, pi.questionText, pi.imagePath,"
              . "pi.inputType, pi.inStat, pi.isFinal, pi.finalLink, pi.finalComment, "
-             . "p.Name AS pollName "
+             . "p.ShowStat AS pollShowStat, p.Name AS pollName "
              . "FROM PollItems AS pi INNER JOIN Polls AS p "
              . "ON pi.id = '$itemId' "
              . "AND pi.pollId = '$pollId' "
@@ -146,6 +123,15 @@ class PollDAO implements IPollDAO
             // Creating a specisl 'system' item to finish questioning a user
             $item = new Item();
             $item->isSystemFinal = true;
+            // Let's find out whethe statistics should be displayed
+            $stmt = $dbh->prepare(
+                "SELECT ShowStat FROM Polls WHERE Id = {$ans->pollId}"
+            );
+            $stmt->execute();
+            $res = $stmt->fetch(PDO::FETCH_NUM);
+            if ($res[0]) {
+                $item->pollShowStat = true;
+            }
             return $item;
         }
         return $this->getItem($ans->pollId, $nextItemId);

@@ -33,7 +33,7 @@ class PollController
     /**
      * Runs the poll
      * 
-     * @return obj Returns View object for rendering the page
+     * @return object Returns View object for rendering the page
      * @throws LogicException
      */
     public function runPoll() {
@@ -118,6 +118,10 @@ class PollController
             if ($item->isSystemFinal) {
                 $this->view->item = $item;
                 $this->pollService->processTempAnswer($token);
+                if ($item->pollShowStat) {
+                    $this->view->stat = $this->pollService->getStat($item->pollId);
+                    return $this->view;
+                }
                 return $this->view->setMessage(UI::$lang['poll_end']);
             }
             if ($item->isFinal) {

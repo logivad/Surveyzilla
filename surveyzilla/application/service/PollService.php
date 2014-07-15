@@ -37,7 +37,7 @@ class PollService
             $ans->generateToken();
             // If such a token already exists (answer will not be inserted and
             // $res will become 0 or FALSE), let's generate a new one
-            $res = $this->pollDAO->addTempAnswer($ans);
+            $res = $this->pollDAO->saveTempAnswer($ans);
         } while (empty($res));
         setcookie('token', $ans->token, time()+60*60*24*7);
         return $ans;
@@ -45,7 +45,7 @@ class PollService
     public function appendTempAnswer($token, array $options, $custopt, $inStat) {
         $ans = $this->pollDAO->getTempAnswer($token);
         $ans->addItem($ans->currentItem, $custopt, $options, $inStat);
-        if (!$this->pollDAO->updateTempAnswer($ans)) {
+        if (!$this->pollDAO->saveTempAnswer($ans)) {
             throw new Exception(UI::$lang['error']);
         }
     }
@@ -62,7 +62,7 @@ class PollService
             throw new Exception('Wrong parameter!');
         }
         $ans->$param = $value;
-        if (!$this->pollDAO->updateTempAnswer($ans)) {
+        if (!$this->pollDAO->saveTempAnswer($ans)) {
             throw new Exception(UI::$lang['error']);
         }
         return $ans;
@@ -96,11 +96,11 @@ class PollService
      * @param type $token
      */
     public function processTempAnswer($token) {
+        $ans = $this->pollDAO->getTempAnswer($token);
+        unset($ans->pollId, $ans->currentItem, $ans->items);
+        $ans->completed = true;
+        $this->pollDAO->saveTempAnswer($ans);
         $this->pollDAO->deleteTempAnswer($token);
-//        $ans = $this->pollDAO->getTempAnswer($token);
-//        unset($ans->pollId, $ans->currentItem, $ans->items);
-//        $ans->completed = true;
-//        $this->pollDAO->updateTempAnswer($ans);
         setcookie('token', NULL, time() - 10000);
     }
     public function makeLogicArray(array $queryResult) {
@@ -120,5 +120,16 @@ class PollService
          * $logic[current Item] = array(options => next Item)
          */
         return $logic;
+    }
+    /**
+     * Returns an array filled by statistical data about the poll
+     * of a given ID
+     * @param int $pollId ID of the poll which statistics to get
+     * @return object $view Returns an array filled with stat. data
+     */
+    public function getStat($pollId) {
+        $stat = array();
+        // TODO: fill the stat
+        return $stat;
     }
 }
