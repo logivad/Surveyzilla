@@ -19,7 +19,14 @@ class Answer
     public function generateToken(){
         return $this->token = microtime(true);
     }
-    public function addItem($itemId, $custom=null, array $options=array()){
+    /**
+     * Saves a user's answer to the $items array
+     * @param int $itemId ID of the item in a database
+     * @param string $custom User's custom option
+     * @param bool $inStat Whether this answer is shown in statistics
+     * @param array $options Selected options from the web form
+     */
+    public function addItem($itemId, $custom=null, array $options=array(), $inStat=true){
         /*
          * Logic uses a bitmask of options (`Options` INT UNSIGNED, 4 bytes).
          * That means If a quizzee selects options 1, 2 and 4, Logic `Options`
@@ -32,7 +39,11 @@ class Answer
         foreach ($options as $val) {
             $bitMask += pow(2, $val-1);
         }
-        $this->items[$itemId] = array('custopt' => $custom, 'opts' => (int) $bitMask);
+        $this->items[$itemId] = array(
+            'custopt' => $custom,
+            'opts' => (int) $bitMask,
+            'stat' => ($inStat) ? true : false
+        );
     }
     public function getCurrentOpts() {
         return $this->items[$this->currentItem]['opts'];

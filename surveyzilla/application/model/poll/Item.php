@@ -8,6 +8,7 @@ class Item
     public $questionText;
     public $imagePath;
     public $inputType;
+    public $inStat;
     public $isFinal;
     // Item with this parameter set to true is passed on to the controller
     // when the poll is finished and no custom final item exists

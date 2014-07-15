@@ -42,13 +42,12 @@ class PollService
         setcookie('token', $ans->token, time()+60*60*24*7);
         return $ans;
     }
-    public function appendTempAnswer($token, array $options, $custopt) {
+    public function appendTempAnswer($token, array $options, $custopt, $inStat) {
         $ans = $this->pollDAO->getTempAnswer($token);
-        $ans->addItem($ans->currentItem, $custopt, $options);
+        $ans->addItem($ans->currentItem, $custopt, $options, $inStat);
         if (!$this->pollDAO->updateTempAnswer($ans)) {
             throw new Exception(UI::$lang['error']);
         }
-        //echo 'new:';var_dump($ans);
     }
     /**
      * Updates TempAnswer record

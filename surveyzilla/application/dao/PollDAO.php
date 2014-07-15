@@ -78,7 +78,7 @@ class PollDAO implements IPollDAO
     public function getItem($pollId, $itemId) {
         // Getting Item from DB (without options)
         $sql = "SELECT pi.id, pi.pollId, pi.questionText, pi.imagePath,"
-             . "pi.inputType, pi.isFinal, pi.finalLink, pi.finalComment, "
+             . "pi.inputType, pi.inStat, pi.isFinal, pi.finalLink, pi.finalComment, "
              . "p.Name AS pollName "
              . "FROM PollItems AS pi INNER JOIN Polls AS p "
              . "ON pi.id = '$itemId' "

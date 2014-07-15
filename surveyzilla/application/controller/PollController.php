@@ -68,7 +68,6 @@ class PollController
             return $this->view;
         } else {
             // Quizzee came again, let's check if he/she answered something
-            //if (!$this->request->isSetParam('opts') && !$this->request->isSetParam('custopt') ) {
             if (!$this->request->isSetParam('submit')) {
                 // If no answer provided, show the user an Item to be answered.
                 // So a user can continue poll after closing the browser
@@ -81,11 +80,11 @@ class PollController
                 $this->view->item = $item;
                 return $this->view;
             }
+            $item = $this->pollService->getCurrentItem($token);
             // Let's check if there is something in opts
             if (null == $this->request->get('opts')) {
                 // No options selected. It's allowed for "checkbox", but
                 // permissible for "radio"
-                $item = $this->pollService->getCurrentItem($token);
                 if ($item->inputType === 'checkbox') {
                     // Imitating such selection that default next Item fires
                     $this->request->set('opts', array(-1));
@@ -103,11 +102,11 @@ class PollController
                 $token,
                 /* if no option selected, we'll imitate such selection that default fires */
                 $this->request->get('opts'),
-                $this->request->get('custopt')
+                $this->request->get('custopt'),
+                $item->inStat
             );
             // Gettting next answer according to the poll logic
             $item = $this->pollService->getNextItem($token);
-            //echo 'next Item:';var_dump($item);
             if (empty($item)) {
                 $this->view->item = new stdClass();
                 $this->view->item->pollName = '';

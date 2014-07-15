@@ -108,6 +108,8 @@ CREATE TABLE `PollItems`
   `questionText` CHAR(255) DEFAULT '',
   `imagePath` CHAR(255),
   `inputType` ENUM('checkbox','radio','text') NOT NULL,
+  `inStat` BOOLEAN DEFAULT TRUE
+    COMMENT 'Specifies whethe the item is shown in statistics',
   `isFinal` BOOLEAN
     COMMENT 'Final item (page) does not have questions, it is used to 
     communicate with a quizzee',
@@ -274,8 +276,8 @@ VALUES (3, '1', 'Какого цвета этот автомобиль?', 'http:
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
 VALUES (NULL, '1', '3', 'Красного'), (NULL, '1', '3', 'Синего');
 
-INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (4, '1', 'Вы различаете цвета, это здорово! Идем дальше?', NULL, 'radio', NULL, NULL);
+INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `inStat`, `IsFinal`, `FinalComment`)
+VALUES (4, '1', 'Вы различаете цвета, это здорово! Идем дальше?', NULL, 'radio', 0, NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
 VALUES (NULL, '1', '4', 'Да'), (NULL, '1', '4', 'Не надо');
@@ -287,7 +289,7 @@ INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType
 VALUES (6, '1', 'Чем из этого Вы умеете пользоваться?', NULL, 'checkbox', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
-VALUES (NULL, '1', '6', 'HTML'), (NULL, '1', '6', 'CSS'), (NULL, '1', '6', 'PHP'), (NULL, '1', '6', 'Не знаю ничего из перечисленного');
+VALUES (NULL, '1', '6', 'HTML'), (NULL, '1', '6', 'CSS'), (NULL, '1', '6', 'PHP'), (NULL, '1', '6', 'Чё это ваще за букавки?');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
 VALUES (7, '1', NULL, NULL, 'radio', 1, 'Будет здорово, когда Вы выучите еще что-нибудь кроме HTML ;-)');
