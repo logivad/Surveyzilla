@@ -192,4 +192,19 @@ class Application
         }
         $this->renderPage($view, 'run');
     }
+    /**
+     * Display poll statistics
+     */
+    private function actionStat() {
+        $ctrl = PollController::getInstance();
+        $this->request->filterStat();
+        $ctrl->setRequest($this->request);
+        $view = $ctrl->getStat();
+        if (isset($view->message)) {
+            $view->content = $this->renderView('runMessage', $view);
+        } else {
+            $view->content = $this->renderView('runStat', $view);
+        }
+        $this->renderPage($view, 'run');
+    }
 }

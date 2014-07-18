@@ -138,4 +138,11 @@ class PollController
             return $this->view;
         }
     }
+    public function getStat() {
+        if (!$this->request->isSetParam('poll')) {
+            return $this->view->setMessage(UI::$lang['poll_notfound']);
+        }
+        $this->view->stat = $this->pollService->getStat($this->request->get('poll'));
+        return $this->view;
+    }
 }

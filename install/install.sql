@@ -158,15 +158,15 @@ CREATE TABLE `Answers`
 (
   `Id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `UserId` INT UNSIGNED,
+  `Token` DECIMAL(14,4) NOT NULL,
   `PollId` INT UNSIGNED NOT NULL,
   `ItemId` INT UNSIGNED NOT NULL,
-  /*`OptionId` INT UNSIGNED NOT NULL,*/
   `Options` CHAR(255),
   `CustomText` CHAR(255),
   FOREIGN KEY (`PollId`) REFERENCES `Polls`(`Id`) ON DELETE CASCADE,
   FOREIGN KEY (`ItemId`) REFERENCES `PollItems`(`id`),
-  /*FOREIGN KEY (`OptionId`) REFERENCES `ItemOptions`(`Id`),*/
-  PRIMARY KEY (`Id`)
+  PRIMARY KEY (`Id`),
+  KEY (`Token`)
 ) ENGINE=InnoDB;
 
 -- List of filters for poll

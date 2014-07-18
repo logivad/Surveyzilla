@@ -46,8 +46,8 @@ class PollDAO implements IPollDAO
         foreach ($ans->items as $itemId => $val) {
             $options = implode(',', $val['optsArr']);
             $custom = ($val['custopt']) ? $val['custopt'] : '';
-            $sql .= "INSERT INTO Answers (PollId, ItemId, Options, CustomText) "
-                 . "VALUES ({$ans->pollId}, $itemId, '$options', '$custom');";
+            $sql .= "INSERT INTO Answers (PollId, Token, ItemId, Options, CustomText) "
+                 . "VALUES ({$ans->pollId},{$ans->token} , $itemId, '$options', '$custom');";
         }
         $stmt = $dbh->prepare($sql);
         if (false == $stmt->execute()) {
@@ -91,7 +91,7 @@ class PollDAO implements IPollDAO
         $options = array();
         $sql = "SELECT `OptionText` FROM `ItemOptions` "
              . "WHERE `PollId` = '$pollId' AND `ItemId` = '$itemId' "
-             . "ORDER BY `PollId`";
+             . "ORDER BY `Id`";
         $stmt = $dbh->query($sql);
         $resultArr = $stmt->fetchAll(PDO::FETCH_NUM);
         foreach ($resultArr as $key => $option) {
@@ -160,11 +160,58 @@ class PollDAO implements IPollDAO
     public function getPollAnswers($pollId) {
         $dbh = DbConnection::getInstance()->getHandler();
         $stmt = $dbh->prepare(
-            "SELECT * FROM Answers WHERE PollId = $pollId"
+            "SELECT ItemId, Options FROM Answers WHERE PollId = $pollId"
         );
         if (false == $stmt->execute()) {
             throw new Exception('Cannot get statistics!');
         }
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getPollVotesCount($pollId) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->prepare(
+            "SELECT COUNT(Token) as votes FROM "
+          . "(SELECT Token FROM `Answers` WHERE PollId = $pollId GROUP BY Token) as t"
+        );
+        if (false == $stmt->execute()) {
+            throw new Exception('Cannot get votes count!');
+        }
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $res['votes'];
+    }
+    public function getItemQuestions($pollId) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->prepare(
+            "SELECT id, questionText FROM PollItems "
+          . "WHERE pollId = $pollId AND NOT questionText IS NULL "
+          . "AND inStat = TRUE"
+        );
+        if (false == $stmt->execute()) {
+            throw new Exception('Cannot get item questions!');
+        }
+        $res = array();
+        while ($item = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $res[$item['id']] = $item['questionText'];
+        }
+        return $res;
+    }
+    public function getOptions($pollId) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->prepare(
+            "SELECT ItemId, OptionText FROM ItemOptions "
+          . "WHERE PollId = $pollId ORDER BY Id"
+        );
+        if (false == $stmt->execute()) {
+            throw new Exception('Cannot get item options!');
+        }
+        $res = array();
+        while ($item = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if (!isset($res[$item['ItemId']])) {
+                // first element is null so options kind of start from "1"
+                $res[$item['ItemId']] = array(null);
+            }
+            $res[$item['ItemId']][] = $item['OptionText'];
+        }
+        return $res;
     }
 }

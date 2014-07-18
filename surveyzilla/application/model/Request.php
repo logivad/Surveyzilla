@@ -90,4 +90,12 @@ class Request
             $this->params['custopt'] = \filter_var($this->params['custopt'], FILTER_SANITIZE_SPECIAL_CHARS);
         }
     }
+    public function filterStat() {
+        if (isset($this->params['stat'])) {
+            $this->params['stat'] = \filter_var($this->params['stat'], FILTER_VALIDATE_INT);
+        }
+        if (isset($this->params['poll'])) {
+            $this->params['poll'] = \filter_var($this->params['poll'], FILTER_VALIDATE_INT);
+        }
+    }
 }

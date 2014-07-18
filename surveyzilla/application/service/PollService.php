@@ -130,12 +130,64 @@ class PollService
      * @return object $view Returns an array filled with stat. data
      */
     public function getStat($pollId) {
-        $stat = $this->pollDAO->getPollAnswers($pollId);
+        $rawStat = $this->pollDAO->getPollAnswers($pollId);
+        // How many people has voted?
+        $votesTotal = $this->pollDAO->getPollVotesCount($pollId);
         // Options is a list of comma separated options' numbers,
         // let's make it an array
-        for ($i = 0, $len = sizeof($stat); $i < $len; $i++) {
-            $stat[$i]['Options'] = explode(',', $stat[$i]['Options']);
+        for ($i = 0, $len = sizeof($rawStat); $i < $len; $i++) {
+            $rawStat[$i]['Options'] = explode(',', $rawStat[$i]['Options']);
         }
-        return $stat;
+        // Calculate number of votes for every option
+        $stat = array();
+        foreach ($rawStat as $item) {
+            if (!isset($stat[$item['ItemId']])) {
+                $stat[$item['ItemId']] = array();
+            }
+            // Counting options for this item
+            foreach ($item['Options'] as $opts) {
+                if (!isset($stat[$item['ItemId']][$opts])) {
+                    $stat[$item['ItemId']][$opts] = 1;
+                } else {
+                    ++$stat[$item['ItemId']][$opts];
+                }
+            }
+        }
+        // Now $stat array looks like this:
+        // 
+        //    array (size=5)            // $stat array
+        //      1 =>                    // For Item #1...
+        //        array (size=2)        // someone selected
+        //          1 => int 1          // option #1 once
+        //          3 => int 2          // option #3 twice
+        //      3 =>                    // For Item #3
+        //        array (size=1)
+        //          1 => int 1          // option #1 once
+
+        // Array of questions (corresponds to item ID's) excluding those
+        // not to be used for statistics (inStat = false)
+        $questions = $this->pollDAO->getItemQuestions($pollId);
+        // Array with optin text for each item/option
+        $optionText= $this->pollDAO->getOptions($pollId);
+        // Forming final array were ID's are replaced with texts.
+        // Also unwanted elements are deleted (inStat = false)
+        $final = array();
+        foreach ($stat as $itemId => $options) {
+            // Items not used in statistics are not listed in $questions array, 
+            // so just skip them
+            if (!isset($questions[$itemId])) {
+                continue;
+            }
+            $final[$questions[$itemId]] = array();
+            foreach ($options as $optionId => $voteCount) {
+                // Show votes as total number and percentage
+                $final[$questions[$itemId]][$optionText[$itemId][$optionId]] = 
+                    array(
+                        'total' => $voteCount, 
+                        'percent' => round($voteCount * 100 / $votesTotal, 2)
+                    );
+            }
+        }
+        return $final;
     }
 }
