@@ -65,6 +65,7 @@ class PollController
             $this->pollService->createTempAnswer($pollId);
             // Display the item for user to answer it
             $this->view->item = $item;
+            $this->view->pollName = $item->pollName;
             return $this->view;
         } else {
             // Quizzee came again, let's check if he/she answered something
@@ -74,10 +75,11 @@ class PollController
                 $item = $this->pollService->getCurrentItem($token);
                 if (empty($item)) {
                     $this->view->item = new stdClass();
-                    $this->view->item->pollName = '';
+                    //$this->view->item->pollName = '';
                     return $this->view->setMessage(UI::$lang['error'].' '.UI::$lang['poll_notfound']);
                 }
                 $this->view->item = $item;
+                $this->view->pollName = $item->pollName;
                 return $this->view;
             }
             $item = $this->pollService->getCurrentItem($token);
@@ -109,7 +111,7 @@ class PollController
             $item = $this->pollService->getNextItem($token);
             if (empty($item)) {
                 $this->view->item = new stdClass();
-                $this->view->item->pollName = '';
+                //$this->view->item->pollName = '';
                 return $this->view->setMessage(UI::$lang['error']);
             }
             // When poll is finished and no Final Item is provided
@@ -119,7 +121,7 @@ class PollController
                 $this->view->item = $item;
                 $this->pollService->processTempAnswer($token);
                 if ($item->pollShowStat) {
-                    $this->view->stat = $this->pollService->getStat($item->pollId);
+                    $this->view = $this->pollService->getStat($item->pollId, $this->view);
                     return $this->view;
                 }
                 return $this->view->setMessage(UI::$lang['poll_end']);
@@ -128,6 +130,7 @@ class PollController
                 // The last item appeared, which means the poll is finished.
                 // TempAnswer must be added to poll statistics and then deleted
                 $this->pollService->processTempAnswer($token);
+                $this->view->pollName = $item->pollName;
                 $this->view->item = $item;
                 return $this->view;
             }
@@ -135,6 +138,7 @@ class PollController
             // Item being displayed, so that the answer counts for this Item
             $this->pollService->updateTempAnswer($token, 'currentItem', $item->id);
             $this->view->item = $item;
+            $this->view->pollName = $item->pollName;
             return $this->view;
         }
     }
@@ -142,7 +146,7 @@ class PollController
         if (!$this->request->isSetParam('poll')) {
             return $this->view->setMessage(UI::$lang['poll_notfound']);
         }
-        $this->view->stat = $this->pollService->getStat($this->request->get('poll'));
+        $this->view = $this->pollService->getStat($this->request->get('poll'), $this->view);
         return $this->view;
     }
 }

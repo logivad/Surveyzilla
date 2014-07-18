@@ -123,13 +123,13 @@ class PollService
          */
         return $logic;
     }
-    /**
-     * Returns an array filled by statistical data about the poll.
+      /**
+     * Populate View with an array filled by statistical data about the poll.
      * Merges results for equal questions.
      * @param int $pollId ID of the poll which statistics to get
      * @return object $view Returns an array filled with stat. data
      */
-    public function getStat($pollId) {
+    public function getStat($pollId, $view) {
         $rawStat = $this->pollDAO->getPollAnswers($pollId);
         // How many people has voted?
         $votesTotal = $this->pollDAO->getPollVotesCount($pollId);
@@ -200,7 +200,8 @@ class PollService
                 }
             }
         }
-        //var_dump($final);exit;
-        return $final;
+        $view->stat = $final;
+        $view->pollName = $this->pollDAO->getPollName($pollId);
+        return $view;
     }
 }

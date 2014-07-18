@@ -214,4 +214,19 @@ class PollDAO implements IPollDAO
         }
         return $res;
     }
+  /**
+     * Returns a name of a poll
+     * @param int $pollId ID of the poll to return a name of
+     */
+    public function getPollName($pollId) {
+        $dbh = DbConnection::getInstance()->getHandler();
+        $stmt = $dbh->prepare(
+            "SELECT Name FROM Polls WHERE Id = $pollId"
+        );
+        if (false == $stmt->execute()) {
+            throw new Exception('Cannot get a name of the poll!');
+        }
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $res['Name'];
+    }
 }

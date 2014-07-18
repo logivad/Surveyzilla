@@ -1,6 +1,7 @@
 * {
     padding: 0;
     margin: 0;
+    border: 0;
 }
 body {
     background-image: url("../img/run-pattern.png");
@@ -83,6 +84,35 @@ label {
 }
 .message p {
     margin-top: 5px;
+}
+
+.graph-bar {
+    background-color: #00CC00;
+    height: 20px;
+    border-radius: 2px
+}
+.question {
+    font-weight: bold;
+    font-size: 0.8em;
+    color: #003388;
+    margin: 30px 0 5px 0;
+}
+.widget-graph table {
+    width: 100%;
+    border: 0;
+}
+.widget-graph td.percentage {
+    border: 0;
+    width: 5%;
+    vertical-align: bottom;
+    font-size: 0.8em;
+}
+.widget-graph .bg {
+    width: 99%;
+    background-color: #DDFFDD;
+}
+.widget-graph .option {
+    font-size: 0.8em;
 }
 
 @media screen and (max-width:480px) {

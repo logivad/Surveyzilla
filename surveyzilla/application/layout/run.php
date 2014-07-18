@@ -11,7 +11,7 @@ use surveyzilla\application\view\UI;
     <body>
         <div class="main-content">
             <div class="title-bar">
-                <p><?php echo (isset($view->item->pollName)) ? $view->item->pollName : '' ?></p>
+                <p><?php echo (isset($view->pollName)) ? $view->pollName : '' ?></p>
             </div>
             <div class="item-content">
                 <?php echo $view->content ?>
