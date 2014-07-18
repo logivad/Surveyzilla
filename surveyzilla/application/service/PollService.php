@@ -124,8 +124,8 @@ class PollService
         return $logic;
     }
     /**
-     * Returns an array filled by statistical data about the poll
-     * of a given ID
+     * Returns an array filled by statistical data about the poll.
+     * Merges results for equal questions.
      * @param int $pollId ID of the poll which statistics to get
      * @return object $view Returns an array filled with stat. data
      */
@@ -171,6 +171,7 @@ class PollService
         $optionText= $this->pollDAO->getOptions($pollId);
         // Forming final array were ID's are replaced with texts.
         // Also unwanted elements are deleted (inStat = false)
+        //var_dump($stat); var_dump($questions); var_dump($optionText);
         $final = array();
         foreach ($stat as $itemId => $options) {
             // Items not used in statistics are not listed in $questions array, 
@@ -178,16 +179,28 @@ class PollService
             if (!isset($questions[$itemId])) {
                 continue;
             }
-            $final[$questions[$itemId]] = array();
+            // Can be already set (poll can containt items with the same questions)
+            if (!isset($final[$questions[$itemId]])) {
+                $final[$questions[$itemId]] = array();
+            }
             foreach ($options as $optionId => $voteCount) {
                 // Show votes as total number and percentage
-                $final[$questions[$itemId]][$optionText[$itemId][$optionId]] = 
-                    array(
-                        'total' => $voteCount, 
-                        'percent' => round($voteCount * 100 / $votesTotal, 2)
+                if (!isset($final[$questions[$itemId]][$optionText[$itemId][$optionId]])) {
+                    $final[$questions[$itemId]][$optionText[$itemId][$optionId]] = 
+                        array(
+                            'total' => $voteCount, 
+                            'percent' => round($voteCount * 100 / $votesTotal, 2)
+                        );
+                } else {
+                    // Such question already exists! Let's merge results
+                    $final[$questions[$itemId]][$optionText[$itemId][$optionId]]['total'] += $voteCount;
+                    $final[$questions[$itemId]][$optionText[$itemId][$optionId]]['percent'] = round(
+                        $final[$questions[$itemId]][$optionText[$itemId][$optionId]]['total'] * 100 / $votesTotal, 2
                     );
+                }
             }
         }
+        var_dump($final);exit;
         return $final;
     }
 }
