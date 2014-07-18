@@ -200,7 +200,7 @@ class PollService
                 }
             }
         }
-        var_dump($final);exit;
+        //var_dump($final);exit;
         return $final;
     }
 }

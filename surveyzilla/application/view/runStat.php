@@ -1,5 +1,5 @@
 <div class="stat">
     <p><b>Статистика по опросу</b></p>
     <br/>
-    <?php var_dump($view->stat) ?>
+    <?php require_once 'surveyzilla/application/view/widget/graph.php'; ?>
 </div>
