@@ -82,7 +82,19 @@ class PollController
                 $this->view->pollName = $item->pollName;
                 return $this->view;
             }
+            // So, a user has token and clicked submit button. If there is
+            // an item parameter in REQUEST, let's check if this is a proper id.
             $item = $this->pollService->getCurrentItem($token);
+            $itemForm = $this->request->get('item');
+            //var_dump($itemForm); var_dump($item); exit;
+            if ($itemForm && $item->id != $itemForm) {
+                // Quizzee is trying to answer the wrong question!
+                return $this->view->setMessage(
+                    UI::$lang['error'] . '<p>' . UI::$lang['wrong_poll'] .
+                    '</p><p><a href="index.php?a=run&poll=' . $item->pollId
+                    . '">' . UI::$lang['back'] . '</a></p>'
+                );
+            }
             // Let's check if there is something in opts
             if (null == $this->request->get('opts')) {
                 // No options selected. It's allowed for "checkbox", but

@@ -83,6 +83,9 @@ class Request
         if (isset($this->params['poll'])) {
             $this->params['poll'] = \filter_var($this->params['poll'], FILTER_VALIDATE_INT);
         }
+        if (isset($this->params['item'])) {
+            $this->params['item'] = \filter_var($this->params['item'], FILTER_VALIDATE_INT);
+        }
         if (isset($this->params['opts'])) {
             $this->params['opts'] = \filter_var_array($this->params['opts'], FILTER_VALIDATE_INT);
         }

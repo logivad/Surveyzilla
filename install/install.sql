@@ -268,13 +268,13 @@ INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
 VALUES (NULL, '1', '1', 'Мужчина'), (NULL, '1', '1', 'Женщина');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (2, '1', 'Какого цвета эта сумочка?', 'http://embed.polyvoreimg.com/cgi/img-thing/size/y/tid/99623953.jpg', 'radio', NULL, NULL);
+VALUES (2, '1', 'Какого цвета этот предмет?', 'http://embed.polyvoreimg.com/cgi/img-thing/size/y/tid/99623953.jpg', 'radio', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
 VALUES (NULL, '1', '2', 'Красного'), (NULL, '1', '2', 'Синего');
 
 INSERT INTO `PollItems` (`Id`, `PollId`, `QuestionText`, `ImagePath`, `InputType`, `IsFinal`, `FinalComment`)
-VALUES (3, '1', 'Какого цвета этот автомобиль?', 'http://www.34cars.ru/images/cms/thumbs/ea0387b33b22c8a3c517e76331b916c618053ecb/mazda_6_730_auto_png.png', 'radio', NULL, NULL);
+VALUES (3, '1', 'Какого цвета этот предмет?', 'http://www.34cars.ru/images/cms/thumbs/ea0387b33b22c8a3c517e76331b916c618053ecb/mazda_6_730_auto_png.png', 'radio', NULL, NULL);
 
 INSERT INTO `ItemOptions` (`Id`, `PollId`, `ItemId`, `OptionText`)
 VALUES (NULL, '1', '3', 'Красного'), (NULL, '1', '3', 'Синего');

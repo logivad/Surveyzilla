@@ -34,8 +34,9 @@ body {
     background-image: -webkit-linear-gradient(top, #00D5FF 0%, #00738A 100%);
     background-image: linear-gradient(to bottom, #00D5FF 0%, #00738A 100%);
 }
-.title-bar p {
+.title-bar h1 {
     margin: 0 15px;
+    font-size: 1em;
 }
 img {
     display: block;
@@ -85,13 +86,16 @@ label {
 .message p {
     margin-top: 5px;
 }
-
+.stat h2 {
+    font-size: 1em;
+    color: #888;
+}
 .graph-bar {
     background-color: #00CC00;
     height: 20px;
     border-radius: 2px
 }
-.question {
+.widget-graph .question {
     font-weight: bold;
     font-size: 0.8em;
     color: #003388;

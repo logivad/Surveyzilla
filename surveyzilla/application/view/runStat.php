@@ -1,5 +1,7 @@
 <div class="stat">
-    <p><b>Статистика</b></p>
-    <br/>
-    <?php require_once 'surveyzilla/application/view/widget/graph.php'; ?>
+    <?php
+    use surveyzilla\application\view\UI;
+    echo '<h2>' . UI::$lang['stat_results'] . '</h2>';
+    require_once 'surveyzilla/application/view/widget/graph.php';
+    ?>
 </div>
