@@ -41,7 +41,7 @@ class PollService
             // $res will become 0 or FALSE), let's generate a new one
             $res = $this->pollDAO->saveTempAnswer($ans);
         } while (empty($res));
-        setcookie('token', $ans->token, time()+60*60*24*7);
+        setcookie("poll$pollId", $ans->token, time()+60*60*24*7);
         return $ans;
     }
     public function appendTempAnswer($token, array $options, $custopt, $inStat) {
@@ -98,9 +98,9 @@ class PollService
      * @param type $token
      */
     public function processTempAnswer($token) {
-        setcookie('token', NULL, time() - 10000);
         $ans = $this->pollDAO->getTempAnswer($token);
         $this->pollDAO->deleteTempAnswer($token);
+        setcookie('poll'.$ans->pollId, NULL, time() - 10000);
         if (!$this->pollDAO->processTempAnswer($ans)) {
             throw new RuntimeException('Error processing the answer');
         }
@@ -131,7 +131,7 @@ class PollService
      */
     public function getStat($pollId, $view) {
         $rawStat = $this->pollDAO->getPollAnswers($pollId);
-        var_dump($rawStat);exit;
+        //var_dump($rawStat);exit;
         // How many people has voted?
         $votesTotal = $this->pollDAO->getPollVotesCount($pollId);
         // Options is a list of comma separated numbers, let's make an array    

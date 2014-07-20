@@ -27,8 +27,8 @@ body {
     width: 300px;
     margin: 30px auto;
     padding: 20px;
-    border: 2px solid gray;
-    border-radius: 4px;
+    border: 0;
+    border-radius: 5px;
 }
 .msg {
     display: block;

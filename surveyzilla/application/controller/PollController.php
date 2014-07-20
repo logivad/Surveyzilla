@@ -45,7 +45,7 @@ class PollController
             return $this->view->setMessage(UI::$lang['poll_notfound']);
         }
         // Token is a timestamp and looks like this: 1404984161.9609
-        $token = filter_input(INPUT_COOKIE, 'token', FILTER_VALIDATE_FLOAT);
+        $token = filter_input(INPUT_COOKIE, "poll$pollId", FILTER_VALIDATE_FLOAT);
         // Quizze can answer the poll just once
         if (false === $this->pollService->isUniqueUser($pollId, $token)){
             $this->view->item = new stdClass();
