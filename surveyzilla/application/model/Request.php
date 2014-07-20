@@ -46,6 +46,9 @@ class Request
     public function isSetParam($key){
         return isset($this->params[$key]);
     }
+    public function isEmptyParam($key){
+        return empty($this->params[$key]);
+    }
     /**
      * Filters email request parameter
      * @return null

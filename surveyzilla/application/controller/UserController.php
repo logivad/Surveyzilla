@@ -105,18 +105,14 @@ class UserController
             return $this->view;
         }
         // Если неавторизованный пользователь впервые зашел на страницу авторизации
-        if (!$this->request->isSetParam('email') || 
-                !$this->request->isSetParam('password')){
+        if ($this->request->isEmptyParam('email') || $this->request->isEmptyParam('password')){
             $this->view->isAuthorized = false;
-            $this->view->message = '';
-            $this->view->title = UI::$lang['log-in'];
             return $this->view;
         }
         // Если пользователь отправил данные для авторизации
         if ($this->service->authorize($this->request->get('email'), $this->request->get('password'))){
             // Пользователь успешно авторизован
             $this->view->isAuthorized = true;
-            //$this->view->message = UI::$lang['success'];
             /* Далее фронт-контроллер отобразит личную страницу пользоватлея,
              * поэтому запишем данные пользователя в объект вида
              */
@@ -130,7 +126,6 @@ class UserController
         } else {
             $this->view->isAuthorized = false;
             $this->view->message = UI::$lang['bad_login'];
-            $this->view->title = 'войти';
             return $this->view;
         }
     }

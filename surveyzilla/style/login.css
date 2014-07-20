@@ -1,0 +1,64 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-image: url("../img/run-pattern.png");
+    background-color: #fff;
+    font-family: Verdana, Geneva, sans-serif;
+}
+#btn {
+    text-align: right;
+    margin-top: 20px;
+}
+.btn {
+    background-color: #fff;
+    border: 2px solid #aaa;
+    display: inline-block;
+    padding: 6px 12px;
+}
+.btn:hover {
+    background-color: #eee;
+    border: 2px solid #888;
+}
+.content {
+    display: block;
+    background-color: #fff;
+    width: 300px;
+    margin: 30px auto;
+    padding: 20px;
+    border: 2px solid gray;
+    border-radius: 4px;
+}
+.msg {
+    display: block;
+    background-color: #fff;
+    width: 300px;
+    margin: 30px auto;
+    padding: 20px;
+    border: 2px solid red;
+    border-radius: 4px;
+    text-align: center;
+}
+.field {
+    display: block;
+    width: 96%;
+    height: 25px;
+    border: 1px solid gray;
+    margin: 3px 0 10px 0;
+    padding: 0 2%;
+}
+@media screen and (max-width:480px) {
+    body {
+        background-image: none;
+    }
+    .content {
+        width: 90%;
+        padding: 5px;
+        border: none;
+    }
+    .msg {
+        width: 90%;
+        padding: 10px 5px;
+    }
+}

@@ -131,10 +131,10 @@ class PollService
      */
     public function getStat($pollId, $view) {
         $rawStat = $this->pollDAO->getPollAnswers($pollId);
+        var_dump($rawStat);exit;
         // How many people has voted?
         $votesTotal = $this->pollDAO->getPollVotesCount($pollId);
-        // Options is a list of comma separated options' numbers,
-        // let's make it an array
+        // Options is a list of comma separated numbers, let's make an array    
         for ($i = 0, $len = sizeof($rawStat); $i < $len; $i++) {
             $rawStat[$i]['Options'] = explode(',', $rawStat[$i]['Options']);
         }

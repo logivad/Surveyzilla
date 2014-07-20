@@ -124,7 +124,7 @@ class Application
             // отобразим страницу входа еще раз
             $view->content = $this->renderView('login', $view);
         }
-        $this->renderPage($view);
+        $this->renderPage($view, 'login');
     }
     /**
      * Logging off
