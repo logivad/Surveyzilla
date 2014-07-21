@@ -130,6 +130,7 @@ class PollService
      * @return object $view Returns an array filled with stat. data
      */
     public function getStat($pollId, $view) {
+        $view->pollId = $pollId;
         $rawStat = $this->pollDAO->getPollAnswers($pollId);
         //var_dump($rawStat);exit;
         // How many people has voted?

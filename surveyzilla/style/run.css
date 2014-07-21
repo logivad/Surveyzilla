@@ -34,6 +34,15 @@ body {
     background-image: -webkit-linear-gradient(top, #00D5FF 0%, #00738A 100%);
     background-image: linear-gradient(to bottom, #00D5FF 0%, #00738A 100%);
 }
+.settings {
+    display: none;
+    width: 94%;
+    font-size: 0.8em;
+    padding: 10px 2%;
+    margin: 0 auto 10px auto;
+    background-color: #fff;
+    border: 1px solid #00738A;
+}
 .title-bar h1 {
     margin: 0 15px;
     font-size: 1em;
@@ -59,6 +68,20 @@ label {
     margin-bottom: 4px;
     background-color: #eee;
 }
+.menu {
+    width: 20px;
+    height: 20px;
+    float: right;
+    margin-right: 12px;
+    border: 0;
+}
+.menu-line {
+    width: 100%;
+    height: 3px;
+    border: 0;
+    background-color: #d3d3d3;
+    margin-bottom: 3px;
+}
 .btn {
     background-color: #fff;
     border: 2px solid #aaa;
@@ -69,6 +92,14 @@ label {
 .btn:hover {
     background-color: #eee;
     border: 2px solid #888;
+}
+.input-text-wide {
+    display: block;
+    margin: 5px auto;
+    width: 96%;
+    padding: 1%;
+    border: 1px solid black;
+    border-radius: 2px;
 }
 .message {
     margin: 40px auto;
@@ -126,6 +157,10 @@ label {
     .main-content {
         width: 100%;
     }
+    .menu {
+        width: 22px;
+        margin: 2px 8px 0 0;
+    }
     .title-bar {
         border-radius: 0;
         margin-top: 0;
@@ -139,5 +174,9 @@ label {
     label {
         padding: 10px;
         margin-bottom: 7px;
+    }
+    .settings {
+        width: 100%;
+        font-size: 1em;
     }
 }
