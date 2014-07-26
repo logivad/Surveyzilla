@@ -130,6 +130,14 @@ class PollService
      * @return object $view Returns an array filled with stat. data
      */
     public function getStat($pollId, $view) {
+        /**
+         * Finds IDs of the first and last Items
+         */
+        function getExtremeItems($arr) {
+            $keysArr = array_keys($arr);
+            sort($keysArr);
+            return array('first' => array_shift($keysArr), 'last' => array_pop($keysArr));
+        }
         $view->pollId = $pollId;
         $rawStat = $this->pollDAO->getPollAnswers($pollId);
         // How many people has voted?
@@ -171,14 +179,34 @@ class PollService
         $optionText= $this->pollDAO->getOptions($pollId);
         // Forming final array were ID's are replaced with texts.
         // Also unwanted elements are deleted (inStat = false)
-        //echo "Total votes: $votesTotal\n"; var_dump($stat); var_dump($questions); var_dump($optionText); exit;
         $final = array();
-        foreach ($stat as $itemId => $options) {
-            // Items not used in statistics are not listed in $questions array, 
-            // so just skip them
-            if (!isset($questions[$itemId])) {
+        // Get min/max ID's among items
+        $extremeItems = getExtremeItems($questions);
+        //echo "<b><small>Total votes: $votesTotal</small></b><br>"; var_dump($stat); var_dump($questions); var_dump($optionText);
+        // Sabstitute item and poll id's with respective titles.
+        // If some items are not present in $stat array, that means nobody answered
+        // them yet and we'll just need to show them with 0 votes
+        for ($itemId = $extremeItems['first']; $itemId <= $extremeItems['last']; $itemId++) {
+            // If the Item does not exist in $stat, it is not yet answered
+            if (!array_key_exists($itemId, $stat) && array_key_exists($itemId, $optionText)) {
+                //var_dump($itemId);
+                $stat[$itemId] = array();
+            }
+            if (!array_key_exists($itemId, $optionText) || !isset($questions[$itemId])) {
+                // Such ID doesn not exist in $optionText array
+                // (it is final Item or some other reason) or is not used in statistics
                 continue;
             }
+            foreach ($optionText[$itemId] as $key => $val) {
+                if ($key == 0) {
+                    continue;
+                }
+                // Just set 0 (no answers so far)
+                if (!array_key_exists($key, $stat[$itemId])) {
+                    $stat[$itemId][$key] = 0;
+                }
+            }
+            $options = $stat[$itemId];
             // Can be already set (poll can containt items with the same questions)
             if (!isset($final[$questions[$itemId]])) {
                 $final[$questions[$itemId]] = array();
@@ -200,6 +228,7 @@ class PollService
                 }
             }
         }
+        //var_dump($final); exit;
         $view->stat = $final;
         $view->pollName = $this->pollDAO->getPollName($pollId);
         return $view;
