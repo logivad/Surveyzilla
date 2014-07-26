@@ -30,8 +30,11 @@ use surveyzilla\application\view\UI;
                     . '<input class="input-text-wide" type="text" value="http://' . Config::$domain . '/index.php?a=run&poll=' . $view->item->pollId . '" /></p>';
                 }elseif (isset($view->stat)) {
                     // Rendering settings block content for poll statistics
-                    echo '<p>' . UI::$lang['link_to_poll'] 
-                    . '<input class="input-text-wide" type="text" value="http://' . Config::$domain . '/index.php?a=run&poll=' . $view->pollId . '" /></p>';
+                    $linkPoll = 'http://' . Config::$domain . '/index.php?a=run&poll=' . $view->pollId;
+                    echo '<p>' . UI::$lang['link_to_poll'] . ' (<a href="' 
+                    . $linkPoll . '" target="blank">' . UI::$lang['goto'] . '</a>)'
+                    . '<input class="input-text-wide" type="text" value="' 
+                    . $linkPoll . '" /></p>';
                 }
                 ?>
             </div>

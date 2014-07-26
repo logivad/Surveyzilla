@@ -132,7 +132,6 @@ class PollService
     public function getStat($pollId, $view) {
         $view->pollId = $pollId;
         $rawStat = $this->pollDAO->getPollAnswers($pollId);
-        //var_dump($rawStat);exit;
         // How many people has voted?
         $votesTotal = $this->pollDAO->getPollVotesCount($pollId);
         // Options is a list of comma separated numbers, let's make an array    
@@ -172,7 +171,7 @@ class PollService
         $optionText= $this->pollDAO->getOptions($pollId);
         // Forming final array were ID's are replaced with texts.
         // Also unwanted elements are deleted (inStat = false)
-        //var_dump($stat); var_dump($questions); var_dump($optionText);
+        //echo "Total votes: $votesTotal\n"; var_dump($stat); var_dump($questions); var_dump($optionText); exit;
         $final = array();
         foreach ($stat as $itemId => $options) {
             // Items not used in statistics are not listed in $questions array, 
