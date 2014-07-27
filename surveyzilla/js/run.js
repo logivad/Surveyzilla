@@ -10,4 +10,7 @@ $(document).ready(function(){
     $('.menu').click(function(){
         $('.settings').toggle();
     });
+    $('#btn_update_stat').click(function(){
+        alert('Updating data...');
+    });
 });
