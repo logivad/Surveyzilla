@@ -1,7 +1,8 @@
 <?php
-
 use surveyzilla\application\Config;
+use surveyzilla\application\service\PollService;
 use surveyzilla\application\view\UI;
+$pollService = PollService::getInstance();
 ?><!DOCTYPE html>
 <html>
     <head>
@@ -20,21 +21,16 @@ use surveyzilla\application\view\UI;
                     <div class="menu-line"></div>
                     <div class="menu-line"></div>
                 </div>
-                <h1><?php echo (isset($view->pollName)) ? $view->pollName : '' ?></h1>
+                <h1><?php echo isset($view->pollName) ? $view->pollName : '' ?></h1>
             </div>
             <div class="settings">
                 <?php
-                if (isset($view->item)) {
-                    // Rendering settings block content for poll running
-                    echo '<p>' . UI::$lang['finish_poll_later'] 
-                    . '<input class="input-text-wide" type="text" value="http://' . Config::$domain . '/index.php?a=run&poll=' . $view->item->pollId . '" /></p>';
+                if (isset($view->item) && true != $view->item->isSystemFinal && true != $view->item->isFinal) {
+                    // Render "you can finish this poll later" block if poll is running
+                    echo $pollService->renderBlockLink($view, 'run');
                 }elseif (isset($view->stat)) {
-                    // Rendering settings block content for poll statistics
-                    $linkPoll = 'http://' . Config::$domain . '/index.php?a=run&poll=' . $view->pollId;
-                    echo '<p>' . UI::$lang['link_to_poll'] . ' (<a href="' 
-                    . $linkPoll . '" target="blank">' . UI::$lang['goto'] . '</a>)'
-                    . '<input class="input-text-wide" type="text" value="' 
-                    . $linkPoll . '" /></p>';
+                    // Render "you can answer this here" block for stat. page
+                    echo $pollService->renderBlockLink($view, 'stat');
                 }
                 ?>
             </div>

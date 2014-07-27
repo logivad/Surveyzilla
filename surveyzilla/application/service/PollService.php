@@ -3,6 +3,7 @@ namespace surveyzilla\application\service;
 
 use Exception;
 use RuntimeException;
+use surveyzilla\application\Config;
 use surveyzilla\application\dao\PollDAO;
 use surveyzilla\application\model\poll\Answer;
 use surveyzilla\application\view\UI;
@@ -44,6 +45,9 @@ class PollService
         setcookie("poll$pollId", $ans->token, time()+60*60*24*7);
         return $ans;
     }
+    /**
+     * Updates Answer object with user's answer
+     */
     public function appendTempAnswer($token, array $options, $custopt, $inStat) {
         $ans = $this->pollDAO->getTempAnswer($token);
         $ans->addItem($ans->currentItem, $custopt, $options, $inStat);
@@ -118,12 +122,10 @@ class PollService
             }
             $logic[$router[0]][$router[1]] = $router[2];
         }
-        /*
-         * $logic[current Item] = array(options => next Item)
-         */
+        // $logic[current Item] = array(options => next Item)
         return $logic;
     }
-      /**
+    /**
      * Populate View with an array filled by statistical data about the poll.
      * Merges results for equal questions.
      * @param int $pollId ID of the poll which statistics to get
@@ -182,14 +184,12 @@ class PollService
         $final = array();
         // Get min/max ID's among items
         $extremeItems = getExtremeItems($questions);
-        //echo "<b><small>Total votes: $votesTotal</small></b><br>"; var_dump($stat); var_dump($questions); var_dump($optionText);
         // Sabstitute item and poll id's with respective titles.
         // If some items are not present in $stat array, that means nobody answered
         // them yet and we'll just need to show them with 0 votes
         for ($itemId = $extremeItems['first']; $itemId <= $extremeItems['last']; $itemId++) {
             // If the Item does not exist in $stat, it is not yet answered
             if (!array_key_exists($itemId, $stat) && array_key_exists($itemId, $optionText)) {
-                //var_dump($itemId);
                 $stat[$itemId] = array();
             }
             if (!array_key_exists($itemId, $optionText) || !isset($questions[$itemId])) {
@@ -217,20 +217,42 @@ class PollService
                     $final[$questions[$itemId]][$optionText[$itemId][$optionId]] = 
                         array(
                             'total' => $voteCount, 
-                            'percent' => round($voteCount * 100 / $votesTotal, 2)
+                            /* we don't need "division by zero" error */
+                            'percent' => $votesTotal ? round($voteCount * 100 / $votesTotal, 2) : 0
                         );
                 } else {
                     // Such question already exists! Let's merge results
                     $final[$questions[$itemId]][$optionText[$itemId][$optionId]]['total'] += $voteCount;
-                    $final[$questions[$itemId]][$optionText[$itemId][$optionId]]['percent'] = round(
+                    $final[$questions[$itemId]][$optionText[$itemId][$optionId]]['percent'] = $votesTotal ? round(
                         $final[$questions[$itemId]][$optionText[$itemId][$optionId]]['total'] * 100 / $votesTotal, 2
-                    );
+                    ) : 0;
                 }
             }
         }
-        //var_dump($final); exit;
         $view->stat = $final;
         $view->pollName = $this->pollDAO->getPollName($pollId);
         return $view;
+    }
+    /**
+     * Renders a proper block with link for settings tab (run layout) matching the case. 
+     * @param string $case Can be 'run' or 'stat'
+     */
+    public function renderBlockLink($view, $case) {
+        switch ($case) {
+            case 'run':
+                return '<div>' . UI::$lang['finish_poll_later'] 
+                . '<input class="input-text-wide" type="text" value="http://' 
+                . Config::$domain . '/index.php?a=run&poll=' . $view->item->pollId 
+                . '" /></div>';
+            case 'stat':
+                $linkPoll = 'http://' . Config::$domain . '/index.php?a=run&poll=' . $view->pollId;
+                return '<div>' . UI::$lang['link_to_poll'] . ' (<a href="' 
+                . $linkPoll . '" target="blank">' . UI::$lang['goto'] . '</a>)'
+                . '<input class="input-text-wide" type="text" value="' 
+                . $linkPoll . '" /></div>';
+            default:
+                return '';
+        }
+        
     }
 }

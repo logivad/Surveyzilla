@@ -21,5 +21,11 @@ $texts = array(
         'account' => 'Acount',
         'admin_page' => 'Admin page',
         'log-off' => 'Log-off',
-        'password' => 'Password'
+        'password' => 'Password',
+        'wrong_poll' => 'Are you trying to re-answer it?',
+        'stat_results' => 'Results',
+        'total_votes' => 'Total votes',
+        'finish_poll_later' => 'You can finish this poll later, just use the link',
+        'link_to_poll' => 'You can find the poll here',
+        'goto' => 'follow'
 );
