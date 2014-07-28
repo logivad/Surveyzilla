@@ -15,4 +15,6 @@ class Config
      */
     public static $lang = 'ru';
     public static $domain = 'surveyzilla.dev';
+    public static $tempAnsDir = 'temp/';
+    public static $cacheDir = 'cache/';
 }

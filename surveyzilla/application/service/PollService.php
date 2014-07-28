@@ -98,7 +98,7 @@ class PollService
         }
     }
     /**
-     * Ads TempAnswer data to the poll statistics
+     * Ads TempAnswer data to the poll statistics and removes temp file
      * @param type $token
      */
     public function processTempAnswer($token) {
@@ -107,6 +107,19 @@ class PollService
         setcookie('poll'.$ans->pollId, NULL, time() - 10000);
         if (!$this->pollDAO->processTempAnswer($ans)) {
             throw new RuntimeException('Error processing the answer');
+        }
+        $this->cachePollStat($ans->pollId);
+    }
+    /**
+     * Calculates statistics for the given poll 
+     * and saves it as JSON object in a file 
+     * 
+     * @param int $pollId ID of the poll
+     */
+    public function cachePollStat($pollId) {
+        $stat = $this->calcStat($pollId);
+        if (false === $this->pollDAO->updateCache($stat, "stat_$pollId")) {
+            throw new Exception('Cannot cache statistics!');
         }
     }
     public function makeLogicArray(array $queryResult) {
@@ -126,12 +139,10 @@ class PollService
         return $logic;
     }
     /**
-     * Populate View with an array filled by statistical data about the poll.
+     * Creates an array filled by statistical data about the poll.
      * Merges results for equal questions.
-     * @param int $pollId ID of the poll which statistics to get
-     * @return object $view Returns an array filled with stat. data
      */
-    public function getStat($pollId, $view) {
+    public function calcStat($pollId) {
         /**
          * Finds IDs of the first and last Items
          */
@@ -140,7 +151,6 @@ class PollService
             sort($keysArr);
             return array('first' => array_shift($keysArr), 'last' => array_pop($keysArr));
         }
-        $view->pollId = $pollId;
         $rawStat = $this->pollDAO->getPollAnswers($pollId);
         // How many people has voted?
         $votesTotal = $this->pollDAO->getPollVotesCount($pollId);
@@ -229,7 +239,14 @@ class PollService
                 }
             }
         }
-        $view->stat = $final;
+        return $final;
+    }
+    /**
+     * Adds $stat object to the $view object
+     */
+    public function getStat($pollId, $view) {
+        $view->pollId = $pollId;
+        $view->stat = json_decode(file_get_contents(Config::$cacheDir . "stat_$pollId"));
         $view->pollName = $this->pollDAO->getPollName($pollId);
         return $view;
     }
@@ -253,6 +270,5 @@ class PollService
             default:
                 return '';
         }
-        
     }
 }

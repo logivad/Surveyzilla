@@ -95,6 +95,9 @@ label {
     background-color: #eee;
     border: 2px solid #888;
 }
+.right .btn {
+    float: right;
+}
 .input-text-wide {
     display: block;
     margin: 5px auto;

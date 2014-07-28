@@ -3,6 +3,7 @@ namespace surveyzilla\application\dao;
 
 use Exception;
 use PDO;
+use surveyzilla\application\Config;
 use surveyzilla\application\dao\DbConnection;
 use surveyzilla\application\model\poll\Answer;
 use surveyzilla\application\model\poll\Item;
@@ -12,8 +13,6 @@ use surveyzilla\application\service\PollService;
 class PollDAO implements IPollDAO
 {
     private static $_instance;
-    // Directory for temp answer files
-    private $tempAnsDir = 'temp/';
     private function __construct(){
         /*empty*/
     }
@@ -37,7 +36,7 @@ class PollDAO implements IPollDAO
     }
     /**
      * Inserts answer data to a database (appends it to the `Answers` table)
-     * @param \surveyzilla\application\model\poll\Answer $ans Answer object
+     * @param Answer $ans Answer object
      * @return boolean Returns TRUE on success or FALSE on failure
      */
     public function processTempAnswer(Answer $ans) {
@@ -56,14 +55,14 @@ class PollDAO implements IPollDAO
         return true;
     }
     public function saveTempAnswer(Answer $ans) {
-        return file_put_contents($this->tempAnsDir . $ans->token, serialize($ans));
+        return file_put_contents(Config::$tempAnsDir . $ans->token, serialize($ans));
     }
     public function getTempAnswer($token) {
-        return unserialize(file_get_contents($this->tempAnsDir . $token));
+        return unserialize(file_get_contents(Config::$tempAnsDir . $token));
     }
     public function deleteTempAnswer($token) {
-        if (file_exists($this->tempAnsDir . $token)) {
-            unlink($this->tempAnsDir . $token);
+        if (file_exists(Config::$tempAnsDir . $token)) {
+            unlink(Config::$tempAnsDir . $token);
         }
     }
     /**
@@ -228,5 +227,15 @@ class PollDAO implements IPollDAO
         }
         $res = $stmt->fetch(PDO::FETCH_ASSOC);
         return $res['Name'];
+    }
+    /**
+     * Encodes $obj to JSON string and saves it in a file named $name
+     * in a site cache directory on disk
+     * 
+     * @param obj $obj JSON object to be updated
+     * @param string $name Name of a file to be saved on disk
+     */
+    public function updateCache($obj, $name) {
+        return file_put_contents(Config::$cacheDir .$name, json_encode($obj, JSON_UNESCAPED_UNICODE)) ? true : false;
     }
 }

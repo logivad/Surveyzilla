@@ -3,3 +3,6 @@ nbproject
 # ignore temp answer files, but track info file
 temp/
 !temp/info
+# ignore cache files, but track info file
+cache/
+!cache/info
