@@ -118,7 +118,7 @@ class PollService
      */
     public function cachePollStat($pollId) {
         $stat = $this->calcStat($pollId);
-        if (false === $this->pollDAO->updateCache($stat, "stat_$pollId")) {
+        if (false === $this->pollDAO->updateCache($stat, "stat_$pollId.json")) {
             throw new Exception('Cannot cache statistics!');
         }
     }
@@ -246,7 +246,10 @@ class PollService
      */
     public function getStat($pollId, $view) {
         $view->pollId = $pollId;
-        $view->stat = json_decode(file_get_contents(Config::$cacheDir . "stat_$pollId"));
+        if (!file_exists(Config::$cacheDir . "stat_$pollId.json")) {
+            return $view;
+        }
+        $view->stat = json_decode(file_get_contents(Config::$cacheDir . "stat_$pollId.json"));
         $view->pollName = $this->pollDAO->getPollName($pollId);
         return $view;
     }

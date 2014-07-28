@@ -31,13 +31,14 @@ $pollService = PollService::getInstance();
                 }elseif (isset($view->stat)) {
                     // Render "you can answer this here" block for stat. page
                     echo $pollService->renderBlockLink($view, 'stat');
-                    echo '<button id="btn_update_stat" class="btn" onclick="refresh()">Обновить</button>';
+                    echo '<label><input type="checkbox" id="refresh"> ' . UI::$lang['stat_auto_refresh'] . '</label>';
                 }
                 ?>
             </div>
             <div class="item-content">
                 <?php echo $view->content ?>
             </div>
+
         </div>
     </body>
 </html>

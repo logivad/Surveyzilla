@@ -27,5 +27,6 @@ $texts = array(
         'total_votes' => 'Total votes',
         'finish_poll_later' => 'You can finish this poll later, just use the link',
         'link_to_poll' => 'You can find the poll here',
-        'goto' => 'follow'
+        'goto' => 'follow',
+        'stat_auto_refresh' => 'Automatically update'
 );

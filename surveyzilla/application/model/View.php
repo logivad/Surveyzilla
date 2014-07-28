@@ -14,6 +14,7 @@ class View
     public $content;                // page content (is inserted into template)
     public $userName;               // contains user name (if authorized)
     public $pollName;
+    public $pollId;
     public $itemQuestion;
     public $options = array();
     public $loggedOff;              // TRUE when user has just logged-off

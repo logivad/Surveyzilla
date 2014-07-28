@@ -133,7 +133,9 @@ class PollController
                 $this->view->item = $item;
                 $this->pollService->processTempAnswer($token);
                 if ($item->pollShowStat) {
-                    $this->view = $this->pollService->getStat($item->pollId, $this->view);
+                    // Just set "stat" property to anything but false
+                    $this->view->stat = true;
+                    $this->view->pollId = $pollId;
                     return $this->view;
                 }
                 return $this->view->setMessage(UI::$lang['poll_end']);
@@ -154,11 +156,21 @@ class PollController
             return $this->view;
         }
     }
+    /**
+     * Reads stat object from cache file and saves it in "stat" 
+     * property of the $view object
+     * 
+     * @return object
+     */
     public function getStat() {
         if (!$this->request->isSetParam('poll')) {
             return $this->view->setMessage(UI::$lang['poll_notfound']);
         }
         $this->view = $this->pollService->getStat($this->request->get('poll'), $this->view);
+        if (!isset($this->view->stat)) {
+            return $this->view->setMessage(UI::$lang['poll_notfound']);
+        }
+        $this->view->pollId = $this->request->get('poll');
         return $this->view;
     }
 }

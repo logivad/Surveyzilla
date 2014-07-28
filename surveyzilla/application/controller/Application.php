@@ -2,11 +2,12 @@
 namespace surveyzilla\application\controller;
 
 use stdClass;
+use surveyzilla\application\Config;
 use surveyzilla\application\controller\PollController;
 use surveyzilla\application\controller\UserController;
-use surveyzilla\application\view\UI;
 use surveyzilla\application\model\Request;
 use surveyzilla\application\model\View;
+use surveyzilla\application\view\UI;
 
 class Application
 {
@@ -186,7 +187,9 @@ class Application
         } elseif (isset ($view->item->isFinal) && $view->item->isFinal == true) {
             $view->content = $this->renderView('runFinal', $view);
         } elseif (isset ($view->stat)) {
-            $view->content = $this->renderView('runStat', $view);
+            // Poll is finished, time to show statistics
+            header('Location: http://' . Config::$domain . "/index.php?a=stat&poll={$view->pollId}");
+            //$view->content = $this->renderView('runStat', $view);
         } else {
             $view->content = $this->renderView('runNormal', $view);
         }
