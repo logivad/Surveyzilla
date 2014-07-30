@@ -21,6 +21,7 @@ body {
 }
 .title-bar {
     width: 100%;
+    min-height: 18px; /* useful when there is no text in h1 */
     color: #FFF;
     font-size: 1.2em;
     text-align: center;

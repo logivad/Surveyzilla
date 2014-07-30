@@ -156,6 +156,12 @@ class PollService
         $votesTotal = $this->pollDAO->getPollVotesCount($pollId);
         // Options is a list of comma separated numbers, let's make an array    
         for ($i = 0, $len = sizeof($rawStat); $i < $len; $i++) {
+            if ($rawStat[$i]['Options'] == '-1') {
+                // If quizzee didn't select anything (allowable for checkbox)
+                // here'll be "-1" option. It's useless now, so just delete it
+                unset($rawStat[$i]);
+                continue;
+            }
             $rawStat[$i]['Options'] = explode(',', $rawStat[$i]['Options']);
         }
         // Calculate number of votes for every option
@@ -185,7 +191,7 @@ class PollService
         //          1 => int 1          // option #1 once
 
         // Array of questions (corresponds to item ID's) excluding those
-        // not to be used for statistics (inStat = false)
+        // not to be used for statistics (inStat = false).
         $questions = $this->pollDAO->getItemQuestions($pollId);
         // Array with optin text for each item/option
         $optionText= $this->pollDAO->getOptions($pollId);

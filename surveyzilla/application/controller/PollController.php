@@ -86,7 +86,6 @@ class PollController
             // an item parameter in REQUEST, let's check if this is a proper id.
             $item = $this->pollService->getCurrentItem($token);
             $itemForm = $this->request->get('item');
-            //var_dump($itemForm); var_dump($item); exit;
             if ($itemForm && $item->id != $itemForm) {
                 // Quizzee is trying to answer the wrong question!
                 return $this->view->setMessage(
@@ -114,7 +113,6 @@ class PollController
             // This function also updates $currentItem
             $this->pollService->appendTempAnswer(
                 $token,
-                /* if no option selected, we'll imitate such selection that default fires */
                 $this->request->get('opts'),
                 $this->request->get('custopt'),
                 $item->inStat
@@ -123,7 +121,6 @@ class PollController
             $item = $this->pollService->getNextItem($token);
             if (empty($item)) {
                 $this->view->item = new stdClass();
-                //$this->view->item->pollName = '';
                 return $this->view->setMessage(UI::$lang['error']);
             }
             // When poll is finished and no Final Item is provided
