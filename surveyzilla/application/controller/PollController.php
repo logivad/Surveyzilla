@@ -40,8 +40,9 @@ class PollController
         // At leat pollId must be set (ids start from "1")
         $pollId = $this->request->get('poll');
         if (empty($pollId)){
+            var_dump($pollId);
             $this->view->item = new stdClass();
-            $this->view->item->pollName = UI::$lang['error'];
+            $this->view->pollName = UI::$lang['error'];
             return $this->view->setMessage(UI::$lang['poll_notfound']);
         }
         // Token is a timestamp and looks like this: 1404984161.9609
@@ -49,7 +50,7 @@ class PollController
         // Quizze can answer the poll just once
         if (false === $this->pollService->isUniqueUser($pollId, $token)){
             $this->view->item = new stdClass();
-            $this->view->item->pollName = UI::$lang['error'];
+            $this->view->pollName = UI::$lang['error'];
             return $this->view->setMessage(UI::$lang['poll_answered']);
         }
         // If no token is given, a new quizzee has come and he needs a token
@@ -76,7 +77,9 @@ class PollController
                 if (empty($item)) {
                     $this->view->item = new stdClass();
                     //$this->view->item->pollName = '';
-                    return $this->view->setMessage(UI::$lang['error'].' '.UI::$lang['poll_notfound']);
+                    return $this->view->setMessage(
+                        UI::$lang['error'].' '.UI::$lang['poll_notfound']
+                    );
                 }
                 $this->view->item = $item;
                 $this->view->pollName = $item->pollName;
@@ -103,6 +106,7 @@ class PollController
                     $this->request->set('opts', array(-1));
                 } elseif ($item->inputType === 'radio') {
                     $this->view->item = $item;
+                    $this->view->pollName = $item->pollName;
                     $msg = UI::$lang['none_selected'] . '<br>'
                          . '<p><a href="index.php?a=run&poll=' . $item->pollId
                          . '">' . UI::$lang['back'] . '</a></p>';

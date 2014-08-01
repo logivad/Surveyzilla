@@ -34,7 +34,7 @@ class Application
             http_response_code(404);
             $view = new stdClass();
             $view->message = 'Странно.. страница не отобразилась';
-            return $this->renderView('runMessage', $view);
+            return $this->renderView('notification', $view);
         }
         // Формируем содержание страницы (будет включено в шаблон)
         ob_start();
@@ -82,7 +82,7 @@ class Application
             http_response_code(404);
             $view->title = 'Not found';
             $view->content = $this->renderView('404');
-            $this->renderPage($view);
+            $this->renderPage($view, '404');
         }
     }
     /**
@@ -124,8 +124,9 @@ class Application
             // Если не авторизован (зашел первый раз, неверно ввел данные и т.д.),
             // отобразим страницу входа еще раз
             $view->content = $this->renderView('login', $view);
+            $view->title= UI::$lang['log-in'];
+            $this->renderPage($view, 'notification');
         }
-        $this->renderPage($view, 'login');
     }
     /**
      * Logging off
@@ -141,9 +142,10 @@ class Application
         } else {
             // Controller failed, something wrong
             $view = new View();
-            $view->message = 'Ошибка!';
-            $view->content = $this->renderView('message', $view);
-            $this->renderPage($view);
+            $view->title = $view->message = UI::$lang['error'];
+            $view->errorCode = 'E0001';
+            $view->content = $this->renderView('notification', $view);
+            $this->renderPage($view, 'notification');
         }
     }
     /**
@@ -183,12 +185,13 @@ class Application
         $ctrl->setRequest($this->request);
         $view = $ctrl->runPoll();
         if (isset($view->message)) {
-            $view->content = $this->renderView('runMessage', $view);
+            $view->content = $this->renderView('notification', $view);
         } elseif (isset ($view->item->isFinal) && $view->item->isFinal == true) {
             $view->content = $this->renderView('runFinal', $view);
         } elseif (isset ($view->stat)) {
             // Poll is finished, time to show statistics
-            header('Location: http://' . Config::$domain . "/index.php?a=stat&poll={$view->pollId}");
+            header('Location: http://' . Config::$domain 
+            . "/index.php?a=stat&poll={$view->pollId}");
             //$view->content = $this->renderView('runStat', $view);
         } else {
             $view->content = $this->renderView('runNormal', $view);
@@ -204,7 +207,7 @@ class Application
         $ctrl->setRequest($this->request);
         $view = $ctrl->getStat();
         if (isset($view->message)) {
-            $view->content = $this->renderView('runMessage', $view);
+            $view->content = $this->renderView('notification', $view);
         } else {
             $view->content = $this->renderView('runStat', $view);
         }

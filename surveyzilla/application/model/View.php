@@ -9,6 +9,7 @@ class View
 {
     public $title;                  // page title
     public $message;                // message for a user (error or notice)
+    public $errorCode;
     public $isAuthorized;           // TRUE for authorized user
     public $isAdmin;                // TRUE for authorized admin user
     public $content;                // page content (is inserted into template)

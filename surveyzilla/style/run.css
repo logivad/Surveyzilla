@@ -107,11 +107,11 @@ label {
     border: 1px solid black;
     border-radius: 2px;
 }
-.message {
+.notification {
     margin: 40px auto;
     text-align: center;
 }
-.message div {
+.notification div {
     display: inline-block;
     background-color: white;
     border: 2px solid red;
@@ -120,7 +120,7 @@ label {
     padding: 15px 20px;
     max-width: 60%;
 }
-.message p {
+.notification p {
     margin-top: 5px;
 }
 .stat h2 {

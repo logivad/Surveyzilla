@@ -10,7 +10,6 @@ function autoload($className){
     require_once str_replace('\\','/',$className).'.php';
 }
 spl_autoload_register('surveyzilla\application\autoload');
-
 $sz = new Application($_REQUEST);
 $sz->setLanguage(Config::$lang);
 $sz->launchAction();

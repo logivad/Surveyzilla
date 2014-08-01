@@ -78,30 +78,36 @@ class Request
     }
     /**
      * Filters request parameters used for poll running:
-     *  poll Id - must be integer
+     *  poll Id and item Id - must be integer
      *  opts    - array with option Ids (integer numbers)
      *  custopt - user's text, filtering special chars
      */
     public function filterPollRunParams() {
         if (isset($this->params['poll'])) {
-            $this->params['poll'] = \filter_var($this->params['poll'], FILTER_VALIDATE_INT);
+            $this->params['poll'] = \filter_var($this->params['poll'], 
+            FILTER_VALIDATE_INT);
         }
         if (isset($this->params['item'])) {
-            $this->params['item'] = \filter_var($this->params['item'], FILTER_VALIDATE_INT);
+            $this->params['item'] = \filter_var($this->params['item'], 
+            FILTER_VALIDATE_INT);
         }
         if (isset($this->params['opts'])) {
-            $this->params['opts'] = \filter_var_array($this->params['opts'], FILTER_VALIDATE_INT);
+            $this->params['opts'] = \filter_var_array($this->params['opts'], 
+            FILTER_VALIDATE_INT);
         }
         if (isset($this->params['custopt'])) {
-            $this->params['custopt'] = \filter_var($this->params['custopt'], FILTER_SANITIZE_SPECIAL_CHARS);
+            $this->params['custopt'] = \filter_var($this->params['custopt'], 
+            FILTER_SANITIZE_SPECIAL_CHARS);
         }
     }
     public function filterStat() {
         if (isset($this->params['stat'])) {
-            $this->params['stat'] = \filter_var($this->params['stat'], FILTER_VALIDATE_INT);
+            $this->params['stat'] = \filter_var($this->params['stat'], 
+            FILTER_VALIDATE_INT);
         }
         if (isset($this->params['poll'])) {
-            $this->params['poll'] = \filter_var($this->params['poll'], FILTER_VALIDATE_INT);
+            $this->params['poll'] = \filter_var($this->params['poll'], 
+            FILTER_VALIDATE_INT);
         }
     }
 }
