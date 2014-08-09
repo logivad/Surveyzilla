@@ -1,8 +1,9 @@
 <?php
 use surveyzilla\application\view\UI;
 ?>
+    <div class="item">
         <form action="index.php" method="GET">
-            <p class="question"><?php echo $view->item->questionText ?></p>
+            <p><?php echo $view->item->questionText ?></p>
             <?php
             if (isset($view->item->imagePath)) {
                 echo "<img src='{$view->item->imagePath}' />\n";
@@ -20,3 +21,4 @@ use surveyzilla\application\view\UI;
             <input type="hidden" name="item" value="<?php echo $view->item->id ?>" />
             <div class="right"><input type="submit" name="submit" value="<?php echo UI::$lang['next'] ?>" class="btn" /></div>
         </form>
+    </div>

@@ -1,13 +1,13 @@
 $(document).ready(function(){
-    $('.menu').hover(
+    $('.btn-menu').hover(
         function(){
-            $('.menu-line').css('background-color','#fff');
+            $('.btn-menu div').css('background-color','orange');
         },
         function(){
-            $('.menu-line').css('background-color','#e3e3e3');
+            $('.btn-menu div').css('background-color','white');
         }
     );
-    $('.menu').click(function(){
+    $('.btn-menu').click(function(){
         $('.settings').toggle();
     });
     function refreshStatData(){

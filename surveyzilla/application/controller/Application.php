@@ -9,6 +9,9 @@ use surveyzilla\application\model\Request;
 use surveyzilla\application\model\View;
 use surveyzilla\application\view\UI;
 
+/**
+ * 
+ */
 class Application
 {
     // Request object, contains params from $_REQUEST
@@ -71,6 +74,10 @@ class Application
     public function launchAction() {
         if ($this->request->isSetParam('a')) {
             $actionName = $this->request->get('a');
+        } elseif ($this->request->isSetParam('stat')) {
+            // Shortcut for statistics
+            $actionName = 'stat';
+            $this->request->set('poll', $this->request->get('stat'));
         } else {
             $actionName = 'main';
         }

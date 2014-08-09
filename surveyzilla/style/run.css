@@ -1,25 +1,51 @@
-* {
-    padding: 0;
-    margin: 0;
-    border: 0;
+/* reset browser styles */
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp,small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+	display: block;
 }
 body {
+	line-height: 1.2;
+}
+ol { 
+	padding-left: 1.4em;
+	list-style: decimal;
+}
+ul {
+	padding-left: 1.4em;
+	list-style: square;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+} 
+/* end reset browser styles */
+
+html {
     background-image: url("../img/run-pattern.png");
     background-color: #fff;
     font-family: Verdana, Geneva, sans-serif;
 }
-.main-content {
+body {
     width: 96%;
     max-width: 600px;
     margin: 0 auto;
 }
-.item-content {
-    margin: 11px auto;
+article {
+    margin: 10px auto;
     background-color: #FFF;
     border-radius: 5px;
     padding: 25px 15px 50px 15px;
 }
-.title-bar {
+header {
     width: 100%;
     min-height: 18px; /* useful when there is no text in h1 */
     color: #FFF;
@@ -42,13 +68,25 @@ body {
     padding: 10px 2%;
     margin: 0 auto 10px auto;
     background-color: #fff;
-    //border: 1px solid #00738A;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-.title-bar h1 {
-    margin: 0 15px;
+/* Poll title */
+h1 {
     font-size: 1em;
+    margin: 0 40px;
+}
+/* "Results" */
+h2 {
+    font-size: 1em;
+    color: #888;
+}
+/* Item question */
+h3 {
+    font-weight: bold;
+    font-size: 0.8em;
+    color: #003388;
+    margin: 30px 0 5px 0;
 }
 img {
     display: block;
@@ -57,10 +95,6 @@ img {
     max-width: 80%;
     height: auto;
     border: 0;
-}
-.question {
-    font-weight: bold;
-    margin-bottom: 20px;
 }
 .options {
     margin-bottom: 15px;
@@ -71,25 +105,24 @@ label {
     margin-bottom: 4px;
     background-color: #eee;
 }
-.menu {
+.btn-menu {
     width: 20px;
     height: 20px;
     float: right;
     margin-right: 12px;
     border: 0;
 }
-.menu-line {
+.btn-menu div {
     width: 100%;
     height: 3px;
     border: 0;
-    background-color: #d3d3d3;
+    background-color: white;
     margin-bottom: 3px;
 }
 .btn {
     background-color: #fff;
     border: 2px solid #aaa;
     display: block;
-    //float: right;
     padding: 6px 12px;
 }
 .btn:hover {
@@ -120,59 +153,55 @@ label {
     padding: 15px 20px;
     max-width: 60%;
 }
+p {
+    margin-bottom: 10px;
+}
 .notification p {
     margin-top: 5px;
 }
-.stat h2 {
-    font-size: 1em;
-    color: #888;
+.item p {
+    font-weight: bold;
 }
 .graph-bar {
-    background-color: #00CC00;
+    background-color: #1E91A8;
     height: 20px;
     border-radius: 2px
 }
-.widget-graph .question {
-    font-weight: bold;
-    font-size: 0.8em;
-    color: #003388;
-    margin: 30px 0 5px 0;
-}
-.widget-graph table {
+table {
     width: 100%;
     border: 0;
 }
-.widget-graph td.percentage {
+td.percentage {
     border: 0;
     width: 5%;
     vertical-align: bottom;
     font-size: 0.8em;
 }
-.widget-graph .bg {
+.bg {
     width: 99%;
-    background-color: #DDFFDD;
+    background-color: #F2F2F2;
 }
-.widget-graph .option {
+td > span {
     font-size: 0.8em;
 }
 
 @media screen and (max-width:480px) {
-    body {
+    html {
         background-image: none;
     }
-    .main-content {
+    body {
         width: 100%;
     }
-    .menu {
+    .btn-menu {
         width: 22px;
         margin: 2px 8px 0 0;
     }
-    .title-bar {
+    header {
         border-radius: 0;
         margin-top: 0;
         padding: 8px 0;
     }
-    .item-content {
+    article {
         margin: 0px auto;
         border-radius: 0;
         padding: 20px 8px 50px 8px;

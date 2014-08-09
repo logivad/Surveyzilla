@@ -266,16 +266,14 @@ class PollService
     public function renderBlockLink($view, $case) {
         switch ($case) {
             case 'run':
-                return '<div>' . UI::$lang['finish_poll_later'] 
-                . '<input class="input-text-wide" type="text" value="http://' 
+                return '<p>' . UI::$lang['finish_poll_later'] 
+                . '</p><input class="input-text-wide" type="text" value="http://' 
                 . Config::$domain . '/index.php?a=run&poll=' . $view->item->pollId 
-                . '" /></div>';
+                . '" />';
             case 'stat':
                 $linkPoll = 'http://' . Config::$domain . '/index.php?a=run&poll=' . $view->pollId;
-                return '<div>' . UI::$lang['link_to_poll'] . ' (<a href="' 
-                . $linkPoll . '" target="blank">' . UI::$lang['goto'] . '</a>)'
-                . '<input class="input-text-wide" type="text" value="' 
-                . $linkPoll . '" /></div>';
+                return '<p>' . UI::$lang['link_to_poll'] . ' <a href="' 
+                . $linkPoll . '" target="_blank">' . UI::$lang['here'] . '</a></p>';
             default:
                 return '';
         }
