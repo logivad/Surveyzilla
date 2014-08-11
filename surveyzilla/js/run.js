@@ -1,10 +1,12 @@
 $(document).ready(function(){
     $('.btn-menu').hover(
         function(){
-            $('.btn-menu div').css('background-color','orange');
+            //$('.btn-menu div').css('background-color','orange');
+            $('.btn-menu div').addClass('glow');
         },
         function(){
-            $('.btn-menu div').css('background-color','white');
+            //$('.btn-menu div').css('background-color','white');
+            $('.btn-menu div').removeClass('glow');
         }
     );
     $('.btn-menu').click(function(){

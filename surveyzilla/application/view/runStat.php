@@ -1,7 +1,7 @@
 <div class="stat" <?php echo "data-sz-poll=\"{$view->pollId}\"" ?>>
 <?php
 use surveyzilla\application\view\UI;
-echo '<h2>' . UI::$lang['stat_results'] . '</h2>';
+//echo '<h2>' . UI::$lang['stat_results'] . '</h2>';
 
 foreach ($view->stat as $q => $opts) {
     echo "<h3>$q</h3>\t";

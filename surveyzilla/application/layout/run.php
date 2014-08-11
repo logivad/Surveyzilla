@@ -14,14 +14,26 @@ $pollService = PollService::getInstance();
         <link rel="stylesheet" href="surveyzilla/style/run.css" />
         <link rel="stylesheet" href="surveyzilla/style/notification.css" />
         <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script-->
+        
+        
+        
+        <!-- ИЗМЕНИТЬ ИЛИ ПОСТАВИТЬ ДРУГУЮ ВЕРСИЮ! -->
+        <script src="surveyzilla/js/jquery-2.1.1.min.js"></script>
+        
+        
+        
         <script src="surveyzilla/js/run.js"></script>
     </head>
     <body>
         <header>
+            <div class="graph-icon" title="<?php echo UI::$lang['stat_results_info'] ?>">
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
             <div class="btn-menu" title="<?php echo UI::$lang['properties'] ?>">
                 <div></div><div></div><div></div>
             </div>
+            
             <h1><?php echo isset($view->pollName) ? $view->pollName : '' ?></h1>
         </header>
         <div class="settings">
