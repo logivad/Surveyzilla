@@ -259,23 +259,4 @@ class PollService
         $view->pollName = $this->pollDAO->getPollName($pollId);
         return $view;
     }
-    /**
-     * Renders a proper block with link for settings tab (run layout) matching the case. 
-     * @param string $case Can be 'run' or 'stat'
-     */
-    public function renderBlockLink($view, $case) {
-        switch ($case) {
-            case 'run':
-                return '<p>' . UI::$lang['finish_poll_later'] 
-                . '</p><input class="input-text-wide" type="text" value="http://' 
-                . Config::$domain . '/index.php?a=run&poll=' . $view->item->pollId 
-                . '" />';
-            case 'stat':
-                $linkPoll = 'http://' . Config::$domain . '/index.php?a=run&poll=' . $view->pollId;
-                return '<p>' . UI::$lang['link_to_poll'] . ' <a href="' 
-                . $linkPoll . '" target="_blank">' . UI::$lang['here'] . '</a></p>';
-            default:
-                return '';
-        }
-    }
 }

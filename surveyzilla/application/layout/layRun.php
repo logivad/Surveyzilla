@@ -18,34 +18,23 @@ $pollService = PollService::getInstance();
         <link rel="stylesheet" href="surveyzilla/style/run.css" />
         <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script-->
         <!--script src="surveyzilla/js/jquery-1.11.1.min.js"></script-->
-        <script src="surveyzilla/js/run.js"></script>
+        <script src="surveyzilla/js/run_normal.js"></script>
     </head>
     <body>
         <article>
             <header>
-                <?php
-                if (isset($view->stat)) {
-                    echo 
-                    '<div class="graph-icon" title="' . UI::$lang['stat_results_info'] . '">
-                        <div></div><div></div><div></div><div></div><div></div><div></div>
-                    </div>';
-                }
-                ?>
                 <div class="btn-menu" title="<?php echo UI::$lang['properties'] ?>">
                     <div></div><div></div><div></div>
                 </div>
-
                 <h1><?php echo isset($view->pollName) ? $view->pollName : '' ?></h1>
             </header>
             <aside class="settings">
                 <?php
                 if (isset($view->item) && true != $view->item->isSystemFinal && true != $view->item->isFinal) {
-                    // Render "you can finish this poll later" block if poll is running
-                    echo $pollService->renderBlockLink($view, 'run');
-                }elseif (isset($view->stat)) {
-                    // Render "you can answer this here" block for stat page
-                    echo $pollService->renderBlockLink($view, 'stat');
-                    echo '<p><label><input type="checkbox" id="refresh"> ' . UI::$lang['stat_auto_refresh'] . '</label></p>';
+                    echo '<p>' . UI::$lang['finish_poll_later'] 
+                    . '</p><input class="input-text-wide" type="text" value="http://' 
+                    . Config::$domain . '/index.php?a=run&poll=' . $view->item->pollId 
+                    . '" />';
                 }
                 ?>
             </aside>

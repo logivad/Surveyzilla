@@ -203,7 +203,7 @@ class Application
         } else {
             $view->content = $this->renderView('runNormal', $view);
         }
-        $this->renderPage($view, 'run');
+        $this->renderPage($view, 'layRun');
     }
     /**
      * Display poll statistics
@@ -218,6 +218,6 @@ class Application
         } else {
             $view->content = $this->renderView('runStat', $view);
         }
-        $this->renderPage($view, 'run');
+        $this->renderPage($view, 'layStat');
     }
 }

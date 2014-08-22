@@ -1,5 +1,10 @@
 // Вариант на чистом JavaScript
 window.onload = function() {
+    
+    /****************************************************
+     * Код для страницы статистики и прохождения опроса *
+     ****************************************************/
+    
     // Сияние кнопки при наведении курсора
     document.getElementsByClassName('btn-menu')[0].onmouseover = function() {
         var btnLines = document.querySelectorAll('.btn-menu div');
@@ -23,6 +28,11 @@ window.onload = function() {
             settingsBox.style.display = 'block';
         }
     };
+    
+    /*******************************
+     * Код для страницы статистики *
+     *******************************/
+
     // Функция для получения статистических данных и обновления графика
     function refreshStatData(){
         var statContainer = document.getElementsByClassName('stat')[0];
