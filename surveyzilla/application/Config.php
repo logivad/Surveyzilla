@@ -13,6 +13,7 @@ class Config
     /*
      * Website parameters
      */
+    // Must be a valid BCP 47 language tag, is used in <html> tag
     public static $lang = 'ru';
     public static $domain = 'surveyzilla.dev';
     public static $tempAnsDir = 'temp/';

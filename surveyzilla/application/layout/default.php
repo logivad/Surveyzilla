@@ -1,5 +1,8 @@
+<?php
+use surveyzilla\application\Config;
+?>
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo Config::$lang ?>">
     <head>
         <title><?php echo $view->title ?></title>
         <meta charset="utf-8" />

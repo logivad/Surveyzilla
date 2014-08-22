@@ -19,6 +19,6 @@ use surveyzilla\application\view\UI;
             <input type="hidden" name="a" value="run" />
             <input type="hidden" name="poll" value="<?php echo $view->item->pollId ?>" />
             <input type="hidden" name="item" value="<?php echo $view->item->id ?>" />
-            <div class="right"><input type="submit" name="submit" value="<?php echo UI::$lang['next'] ?>" class="btn" /></div>
+            <div class="stat-next-btn"><input type="submit" name="submit" value="<?php echo UI::$lang['next'] ?>" class="btn" /></div>
         </form>
     </div>
