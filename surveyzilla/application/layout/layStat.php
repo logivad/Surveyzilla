@@ -20,28 +20,28 @@ $pollService = PollService::getInstance();
     </head>
     <body>
         <main>
-            
-                <header>
-                    <div class="graph-icon" title="<?php echo UI::$lang['stat_results_info'] ?>">
-                        <div></div><div></div><div></div><div></div><div></div><div></div>
-                    </div>
-                    <div class="btn-menu" title="<?php echo UI::$lang['properties'] ?>">
-                        <div></div><div></div><div></div>
-                    </div>
-                    <h1><?php echo isset($view->pollName) ? $view->pollName : '' ?></h1>
-                </header>
-                <aside class="settings">
-                    <h2 style="display: none;"><?php echo UI::$lang['settings'] ?></h2>
-                    <?php
-                    // Echo "you can answer the poll here" link
-                    $linkPoll = 'http://' . Config::$domain . '/index.php?a=run&poll=' . $view->pollId;
-                    echo '<p>' . UI::$lang['link_to_poll'] . ' <a href="' 
-                    . $linkPoll . '" target="_blank">' . UI::$lang['here'] . '</a></p>';
-                    ?>
-                    <p><label><input type="checkbox" id="refresh"><?php echo UI::$lang['stat_auto_refresh'] ?></label></p>
-                </aside>
+            <header>
+                <div class="graph-icon" title="<?php echo UI::$lang['stat_results_info'] ?>">
+                    <div></div><div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div class="btn-menu" title="<?php echo UI::$lang['properties'] ?>">
+                    <div></div><div></div><div></div>
+                </div>
+                <h1><?php echo isset($view->pollName) ? $view->pollName : '' ?></h1>
+            </header>
+            <aside class="settings">
+                <h2 style="display: none;"><?php echo UI::$lang['poll_settings'] ?></h2>
+                <?php
+                // Echo "you can answer the poll here" link
+                $linkPoll = 'http://' . Config::$domain . '/index.php?a=run&poll=' . $view->pollId;
+                echo '<p>' . UI::$lang['link_to_poll'] . ' <a href="' 
+                . $linkPoll . '" target="_blank">' . UI::$lang['here'] . '</a></p>';
+                ?>
+                <p><label><input type="checkbox" id="refresh"><?php echo UI::$lang['stat_auto_refresh'] ?></label></p>
+            </aside>
+            <div class="content-wrapper">
                 <?php echo $view->content ?>
-            
+            </div>
         </main>
     </body>
 </html>

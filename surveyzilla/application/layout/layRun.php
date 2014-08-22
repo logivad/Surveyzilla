@@ -16,12 +16,10 @@ $pollService = PollService::getInstance();
             <script src="js/html5shiv.js"></script>
         <![endif]-->
         <link rel="stylesheet" href="surveyzilla/style/run.css" />
-        <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script-->
-        <!--script src="surveyzilla/js/jquery-1.11.1.min.js"></script-->
         <script src="surveyzilla/js/run_normal.js"></script>
     </head>
     <body>
-        <article>
+        <main>
             <header>
                 <div class="btn-menu" title="<?php echo UI::$lang['properties'] ?>">
                     <div></div><div></div><div></div>
@@ -29,6 +27,7 @@ $pollService = PollService::getInstance();
                 <h1><?php echo isset($view->pollName) ? $view->pollName : '' ?></h1>
             </header>
             <aside class="settings">
+                <h2 style="display: none;"><?php echo UI::$lang['poll_settings'] ?></h2>
                 <?php
                 if (isset($view->item) && true != $view->item->isSystemFinal && true != $view->item->isFinal) {
                     echo '<p>' . UI::$lang['finish_poll_later'] 
@@ -38,9 +37,9 @@ $pollService = PollService::getInstance();
                 }
                 ?>
             </aside>
-            <section>
+            <div class="content-wrapper">
                 <?php echo $view->content ?>
-            </section>
-        </article>
+            </div>
+        </main>
     </body>
 </html>

@@ -39,7 +39,7 @@ body {
     min-width: 300px;
     margin: 0 auto;
 }
-.stat {
+.content-wrapper {
     margin: 10px auto;
     background-color: #FFF;
     border-radius: 5px;
@@ -165,7 +165,7 @@ label {
 .btn {
     background-color: #fff;
     border: 2px solid #aaa;
-    display: block;
+    display: inline-block;
     padding: 6px 12px;
 }
 .btn:hover {
