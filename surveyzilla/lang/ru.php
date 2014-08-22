@@ -30,5 +30,6 @@ $texts = array(
         'here' => 'здесь',
         'goto' => 'перейти',
         'stat_auto_refresh' => 'Автоматически обновлять данные',
-        'properties' => 'Параметры'
+        'properties' => 'Параметры',
+        'settings' => 'Параметры опроса'
 );

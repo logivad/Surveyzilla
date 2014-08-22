@@ -31,6 +31,7 @@ $pollService = PollService::getInstance();
                     <h1><?php echo isset($view->pollName) ? $view->pollName : '' ?></h1>
                 </header>
                 <aside class="settings">
+                    <h2 style="display: none;"><?php echo UI::$lang['settings'] ?></h2>
                     <?php
                     // Echo "you can answer the poll here" link
                     $linkPoll = 'http://' . Config::$domain . '/index.php?a=run&poll=' . $view->pollId;
